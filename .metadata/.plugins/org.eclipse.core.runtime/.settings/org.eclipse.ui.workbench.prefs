@@ -1,0 +1,9 @@
+//org.eclipse.ui.commands/state/com.perforce.team.ui.commands.showStreams.radio/org.eclipse.ui.commands.radioState=Tree
+//org.eclipse.ui.commands/state/com.rsi.idldt.scm.command.toggle.perspectiveBar/org.eclipse.ui.commands.toggleState=false
+ColorsAndFontsPreferencePage.expandedCategories=Torg.eclipse.debug.ui.presentation\tTorg.eclipse.ui.workbenchMisc\tTorg.eclipse.ui.presentation.default\tTorg.eclipse.compare.contentmergeviewer.TextMergeViewer
+ColorsAndFontsPreferencePage.selectedElement=Forg.eclipse.debug.ui.consoleFont
+PLUGINS_NOT_ACTIVATED_ON_STARTUP=
+eclipse.preferences.version=1
+org.eclipse.debug.ui.consoleFont=1|Courier New|15.0|0|WINDOWS|1|-20|0|0|0|400|0|0|0|0|3|2|1|49|Courier New;
+org.eclipse.jface.textfont=1|Courier New|16.0|0|WINDOWS|1|-19|0|0|0|0|0|0|0|1|0|0|0|0|Courier New;
+pref_console_font=1|Courier New|14.25|0|WINDOWS|1|-19|0|0|0|400|0|0|0|0|3|2|1|49|Courier New;

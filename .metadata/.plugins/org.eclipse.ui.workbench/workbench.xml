@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workbench version="2.0">
+<workbenchAdvisor/>
+<window height="1039" width="974" x="953" y="0">
+<fastViewData fastViewLocation="1024">
+<orientation position="512" view="org.eclipse.debug.ui.DebugView"/>
+</fastViewData>
+<perspectiveBar>
+<itemSize x="0"/>
+</perspectiveBar>
+<coolbarLayout>
+<coolItem id="org.eclipse.ui.workbench.file" itemType="typeToolBarContribution" x="659" y="56"/>
+<coolItem id="com.rsi.idldt.ui.textedit.toolbar" itemType="typeToolBarContribution" x="288" y="56"/>
+<coolItem id="com.rsi.idldt.ui.toolbar.debugTools" itemType="typeToolBarContribution" x="458" y="56"/>
+</coolbarLayout>
+<page aggregateWorkingSetId="Aggregate for window 1679318208551" focus="true" label="工作空间 － IDL">
+<editors>
+<editorArea activeWorkbook="DefaultEditorWorkbook">
+<info part="DefaultEditorWorkbook">
+<folder appearance="1" expanded="2">
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
+</presentation>
+</folder>
+</info>
+</editorArea>
+<editor activePart="true" focus="true" id="com.rsi.idldt.proeditor.ProEditor" name="qa.pro" partName="qa.pro" path="E:/RSCode/IDL/qa.pro" title="qa.pro" tooltip="IDL/qa.pro" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/IDL/qa.pro"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="254" selectionTopPixel="0"/>
+</editor>
+</editors>
+<views>
+<view id="org.eclipse.ui.navigator.ProjectExplorer" partName="项目资源管理器">
+<viewState CommonNavigator.LINKING_ENABLED="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0"/>
+</view>
+<view id="com.rsi.idldt.ui.views.CommandHistoryView" partName="历史命令">
+<viewState columnWidth0="200" grp200="1" grp203="1" grp204="1" grp205="1" grp206="1" showTreeView="1" sortColumn="1" sortDirection="128"/>
+</view>
+<view id="com.rsi.idldt.console.IDLConsoleView" partName="IDL控制台">
+<viewState/>
+</view>
+<view id="org.eclipse.debug.ui.DebugView" partName="调试">
+<viewState/>
+</view>
+<view id="org.eclipse.ui.views.ProblemView" partName="问题">
+<viewState PRIMARY_SORT_FIELD="org.eclipse.ui.ide.severityAndDescriptionField" categoryGroup="org.eclipse.ui.ide.severity" markerContentGenerator="org.eclipse.ui.ide.problemsGenerator" partName="问题">
+<columnWidths org.eclipse.ui.ide.locationField="90" org.eclipse.ui.ide.markerType="90" org.eclipse.ui.ide.pathField="120" org.eclipse.ui.ide.resourceField="90" org.eclipse.ui.ide.severityAndDescriptionField="300"/>
+<visible IMemento.internal.id="org.eclipse.ui.ide.severityAndDescriptionField"/>
+<visible IMemento.internal.id="org.eclipse.ui.ide.resourceField"/>
+<visible IMemento.internal.id="org.eclipse.ui.ide.pathField"/>
+<visible IMemento.internal.id="org.eclipse.ui.ide.locationField"/>
+<visible IMemento.internal.id="org.eclipse.ui.ide.markerType"/>
+</viewState>
+</view>
+<view id="org.eclipse.debug.ui.VariableView" partName="变量查看器">
+<viewState/>
+</view>
+<view id="org.eclipse.ui.views.ContentOutline" partName="大纲"/>
+</views>
+<perspectives activePart="com.rsi.idldt.proeditor.ProEditor" activePerspective="com.rsi.idldt.ui.IDLPerspective">
+<perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
+<descriptor class="com.rsi.idldt.internal.ui.IDLPerspectiveFactory" id="com.rsi.idldt.ui.IDLPerspective" label="IDL"/>
+<alwaysOnActionSet id="com.rsi.idldt.ui.actionSets.CmdLine"/>
+<alwaysOnActionSet id="com.rsi.idldt.ui.actionSets.Run"/>
+<alwaysOnActionSet id="com.rsi.idldt.ui.actionSets.Wizard"/>
+<alwaysOnActionSet id="com.rsi.idldt.ui.actionSets.Help"/>
+<alwaysOnActionSet id="com.rsi.idldt.ui.MacroActionSet"/>
+<alwaysOnActionSet id="com.rsi.idldt.tasks.actionSets.Wizard"/>
+<alwaysOnActionSet id="org.eclipse.ui.cheatsheets.actionSet"/>
+<alwaysOnActionSet id="org.eclipse.search.searchActionSet"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.annotationNavigation"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.navigation"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.convertLineDelimitersTo"/>
+<alwaysOnActionSet id="org.eclipse.ui.actionSet.keyBindings"/>
+<alwaysOnActionSet id="org.eclipse.ui.actionSet.openFiles"/>
+<alwaysOnActionSet id="org.eclipse.ui.NavigateActionSet"/>
+<alwaysOnActionSet id="org.eclipse.debug.ui.breakpointActionSet"/>
+<alwaysOnActionSet id="com.rsi.idldt.ui.CodingActionSet"/>
+<alwaysOnActionSet id="org.eclipse.debug.ui.debugActionSet"/>
+<show_view_action id="org.eclipse.search.ui.views.SearchView"/>
+<show_view_action id="org.eclipse.ui.views.ProblemView"/>
+<show_view_action id="org.eclipse.ui.views.TaskList"/>
+<show_view_action id="org.eclipse.ui.views.BookmarkView"/>
+<hide_toolbar_item_id id="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly"/>
+<view id="com.rsi.idldt.console.IDLConsoleView"/>
+<view id="com.rsi.idldt.ui.views.CommandHistoryView"/>
+<view id="org.eclipse.ui.views.ProblemView"/>
+<view id="org.eclipse.ui.navigator.ProjectExplorer"/>
+<view id="org.eclipse.ui.views.ContentOutline"/>
+<view id="org.eclipse.debug.ui.VariableView"/>
+<fastViews>
+<view id="org.eclipse.debug.ui.DebugView" ratio="0.3"/>
+</fastViews>
+<fastViewBars/>
+<layout>
+<mainWindow>
+<info folder="true" part="left">
+<folder activePageID="org.eclipse.ui.navigator.ProjectExplorer" appearance="2" expanded="2">
+<page content="org.eclipse.ui.navigator.ProjectExplorer" label="项目资源管理器"/>
+<page content="org.eclipse.ui.views.ContentOutline" label="大纲"/>
+<page content="org.eclipse.debug.ui.VariableView" label="变量查看器"/>
+<page content="org.eclipse.ui.views.ResourceNavigator" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
+<part id="1"/>
+<part id="2"/>
+</presentation>
+</folder>
+</info>
+<info folder="true" part="stickyFolderRight" ratio="0.75" ratioLeft="750" ratioRight="250" relationship="2" relative="left">
+<folder appearance="2" expanded="2">
+<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
+<page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
+<page content="org.eclipse.ui.cheatsheets.views.CheatSheetView" label="LabelNotFound"/>
+</folder>
+</info>
+<info part="com.rsi.idldt.HierarchyView" ratio="0.7" ratioLeft="700" ratioRight="300" relationship="2" relative="left"/>
+<info folder="true" part="bottom" ratio="0.5990712" ratioLeft="387" ratioRight="259" relationship="4" relative="left">
+<folder activePageID="com.rsi.idldt.console.IDLConsoleView" appearance="2" expanded="2">
+<page content="com.rsi.idldt.console.IDLConsoleView" label="IDL控制台"/>
+<page content="com.rsi.idldt.ui.views.CommandHistoryView" label="历史命令"/>
+<page content="org.eclipse.ui.views.ProblemView" label="问题"/>
+<page content="org.eclipse.search.ui.views.SearchView" label="LabelNotFound"/>
+<page content="org.eclipse.debug.ui.BreakpointView" label="LabelNotFound"/>
+<page content="*" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
+<part id="1"/>
+<part id="2"/>
+</presentation>
+</folder>
+</info>
+<info part="org.eclipse.ui.editorss" ratio="0.122577265" ratioLeft="234" ratioRight="1675" relationship="2" relative="left"/>
+</mainWindow>
+</layout>
+</perspective>
+</perspectives>
+<workingSets/>
+<navigationHistory>
+<editors>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" path="/IDL/qa.pro"/>
+</editors>
+<item active="true" historyLabel="qa.pro" index="0">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+</navigationHistory>
+<input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
+</page>
+<workbenchWindowAdvisor/>
+<actionBarAdvisor/>
+<trimLayout>
+<trimArea IMemento.internal.id="128">
+<trimItem IMemento.internal.id="org.eclipse.ui.internal.WorkbenchWindow.topBar"/>
+</trimArea>
+<trimArea IMemento.internal.id="1024">
+<trimItem IMemento.internal.id="org.eclise.ui.internal.FastViewBar"/>
+<trimItem IMemento.internal.id="org.eclipse.jface.action.StatusLineManager"/>
+<trimItem IMemento.internal.id="org.eclipse.ui.internal.progress.ProgressRegion"/>
+</trimArea>
+</trimLayout>
+</window>
+<mruList>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" name="qa.pro" tooltip="IDL/qa.pro">
+<persistable path="/IDL/qa.pro"/>
+</file>
+</mruList>
+</workbench>
