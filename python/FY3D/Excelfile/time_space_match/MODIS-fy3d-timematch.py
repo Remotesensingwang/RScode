@@ -23,17 +23,19 @@ from FY3D.Demofunction.JDay_calculate import time2mjd
 
 # input_fy3d_file=r'H:\00data\TOA\FY3D\removecloud\fycloudpro\1kmstd\315(20km-5)\dh_dingbiao_fy3d1km_5.xlsx'
 # input_modis_file=r'H:\00data\TOA\MODIS\removecloud\2019\1kmstd\315(20km-5)\dh_dingbiao_modis1km_5.xlsx'
-input_fy3d_file=r'H:\00data\TOA\FY3D\removecloud\fycloudpro\1kmstd\317(10km-6)\dh_dingbiao_fy3d10km_6.xlsx'
-input_modis_file=r'H:\00data\TOA\MODIS\removecloud\2019\1kmstd\317(10km-6)\dh_dingbiao_modis10km_6.xlsx'
+# input_fy3d_file=r'H:\00data\TOA\FY3D\removecloud\fycloudpro\1kmstd\317(10km-6)\dh_dingbiao_fy3d10km_6.xlsx'
+# input_modis_file=r'H:\00data\TOA\MODIS\removecloud\2019\1kmstd\317(10km-6)\dh_dingbiao_modis10km_6.xlsx'
 output_file=r'H:\00data\TOA\FY3D\removecloud\fycloudpro\1kmstd\315(20km-5)\dh-fy3-modis-20km_5.xlsx'
 
+input_fy3d_file=r'H:\00data\TOA\FY3D\removecloud\fycloudpro\20km\dh_dingbiao_fy3d20km_5-RA.xlsx'
+input_modis_file=r'H:\00data\TOA\FY3D\removecloud\fycloudpro\20km\dh_dingbiao_modisd20km_4-RA.xlsx'
 
 
 # df_modis_base = pd.read_excel(input_modis_file,header=None)  # From an Excel file
 # df_fy3d_base = pd.read_excel(input_fy3d_file,header=None)  # From an Excel file
 
-df_modis_base = pd.read_excel(input_modis_file,sheet_name="2q+stdlt0.013")  # From an Excel file
-df_fy3d_base = pd.read_excel(input_fy3d_file,sheet_name="2q+stdlt0.013")  # From an Excel file
+df_modis_base = pd.read_excel(input_modis_file,sheet_name="2q+stdlt0.010")  # From an Excel file
+df_fy3d_base = pd.read_excel(input_fy3d_file,sheet_name="2q+stdlt0.010-RA")  # From an Excel file
 
 # df_modis_base.dropna(inplace = True)
 # df_fy3d_base.dropna(inplace = True)
@@ -85,7 +87,7 @@ fy3d_julday_data=df_fy3d_base['FY_JD'].values.ravel()
 modis_julday_data=df_modis_base['MODIS_JD'].values.ravel()
 length=fy3d_julday_data.size
 # 根据儒略日进行时间匹配(前后60分钟)
-MODIS_Data=np.ndarray(shape=(length,17), dtype=np.float64)+np.nan
+MODIS_Data=np.ndarray(shape=(length,13), dtype=np.float64)+np.nan
 for i in range(length):
     day_diff_time=fy3d_julday_data[i]-modis_julday_data
 
@@ -101,5 +103,5 @@ result = pd.concat([df_fy3d_base, df_m], axis=1)
 result.dropna(inplace = True)
 # result.to_excel(excel_writer=output_file,index=False,header = True)
 with pd.ExcelWriter(input_fy3d_file, mode='a', engine='openpyxl') as writer:
-    result.to_excel(writer, sheet_name="modis-fy3d-0.013", index=False, header=True)
+    result.to_excel(writer, sheet_name="modis-fy3dRA-0.010", index=False, header=True)
 # # print('1')
