@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workbench version="2.0">
 <workbenchAdvisor/>
-<window height="1039" width="974" x="953" y="0">
+<window height="1039" maximized="true" width="974" x="747" y="100">
 <fastViewData fastViewLocation="1024">
 <orientation position="512" view="org.eclipse.debug.ui.DebugView"/>
 </fastViewData>
@@ -9,7 +9,7 @@
 <itemSize x="0"/>
 </perspectiveBar>
 <coolbarLayout>
-<coolItem id="org.eclipse.ui.workbench.file" itemType="typeToolBarContribution" x="659" y="56"/>
+<coolItem id="org.eclipse.ui.workbench.file" itemType="typeToolBarContribution" x="211" y="56"/>
 <coolItem id="com.rsi.idldt.ui.textedit.toolbar" itemType="typeToolBarContribution" x="288" y="56"/>
 <coolItem id="com.rsi.idldt.ui.toolbar.debugTools" itemType="typeToolBarContribution" x="458" y="56"/>
 </coolbarLayout>
@@ -20,13 +20,18 @@
 <folder appearance="1" expanded="2">
 <presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
 <part id="0"/>
+<part id="1"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
-<editor activePart="true" focus="true" id="com.rsi.idldt.proeditor.ProEditor" name="qa.pro" partName="qa.pro" path="E:/RSCode/IDL/qa.pro" title="qa.pro" tooltip="IDL/qa.pro" workbook="DefaultEditorWorkbook">
+<editor id="com.rsi.idldt.proeditor.ProEditor" name="qa.pro" partName="qa.pro" path="E:/RSCode/IDL/qa.pro" title="qa.pro" tooltip="IDL/qa.pro" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/IDL/qa.pro"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="254" selectionTopPixel="0"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="230" selectionTopPixel="0"/>
+</editor>
+<editor activePart="true" focus="true" id="com.rsi.idldt.proeditor.ProEditor" name="fy3d_calculate_toa320.pro" partName="fy3d_calculate_toa320.pro" path="E:/RSCode/IDL/FY3Dcode/TOA/DH/230320/fy3d_calculate_toa320.pro" title="fy3d_calculate_toa320.pro" tooltip="IDL/FY3Dcode/TOA/DH/230320/fy3d_calculate_toa320.pro" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/IDL/FY3Dcode/TOA/DH/230320/fy3d_calculate_toa320.pro"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="6807" selectionTopPixel="2562"/>
 </editor>
 </editors>
 <views>
@@ -139,9 +144,40 @@
 <navigationHistory>
 <editors>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" path="/IDL/qa.pro"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" path="/IDL/FY3Dcode/TOA/DH/230320/fy3d_calculate_toa320.pro"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" path="/IDL/qa.pro"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" path="/IDL/t1.pro"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" path="/IDL/test.pro"/>
 </editors>
-<item active="true" historyLabel="qa.pro" index="0">
+<item historyLabel="qa.pro" index="0">
 <position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="fy3d_calculate_toa320.pro" index="1">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="qa.pro" index="2">
+<position info="not_deleted" x="230" y="0"/>
+</item>
+<item historyLabel="t1.pro" index="3">
+<position info="not_deleted" x="927" y="0"/>
+</item>
+<item historyLabel="test.pro" index="4">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="test.pro" index="4">
+<position info="not_deleted" x="981" y="0"/>
+</item>
+<item historyLabel="test.pro" index="4">
+<position info="not_deleted" x="1436" y="0"/>
+</item>
+<item historyLabel="t1.pro" index="3">
+<position info="not_deleted" x="927" y="0"/>
+</item>
+<item historyLabel="qa.pro" index="2">
+<position info="not_deleted" x="230" y="0"/>
+</item>
+<item active="true" historyLabel="fy3d_calculate_toa320.pro" index="1">
+<position info="not_deleted" x="218" y="0"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -160,6 +196,15 @@
 </trimLayout>
 </window>
 <mruList>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" name="test.pro" tooltip="IDL/test.pro">
+<persistable path="/IDL/test.pro"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" name="t1.pro" tooltip="IDL/t1.pro">
+<persistable path="/IDL/t1.pro"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" name="fy3d_calculate_toa320.pro" tooltip="IDL/FY3Dcode/TOA/DH/230320/fy3d_calculate_toa320.pro">
+<persistable path="/IDL/FY3Dcode/TOA/DH/230320/fy3d_calculate_toa320.pro"/>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.rsi.idldt.proeditor.ProEditor" name="qa.pro" tooltip="IDL/qa.pro">
 <persistable path="/IDL/qa.pro"/>
 </file>
