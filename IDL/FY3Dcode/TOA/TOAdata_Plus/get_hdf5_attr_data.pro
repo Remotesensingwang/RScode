@@ -10,7 +10,7 @@ function get_hdf5_attr_data,hd_file,var_name,attr_name
   dataset_id=H5D_OPEN(file_id,var_name)
   attr_id=H5A_OPEN_Name(dataset_id,attr_name)
   data=H5A_READ(attr_id) ;获取属性值
-  return,data
   h5d_close,dataset_id
-  h5d_close,file_id
+  h5f_close,file_id
+  return,data
 end

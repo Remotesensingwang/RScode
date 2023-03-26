@@ -34,7 +34,9 @@ pro FY3D_cloud_pro,FY3DFile,TOAdata,CloudData,area=area,$
   CloudData = MAKE_ARRAY(NS,NL,VALUE=1,/BYTE) ;背景值为1
   ;设置非背景值为0
   CloudData[WHERE(Data0047 GT 0 AND Data0047 LT 1)] = 0B  ; 有效值为0
-  w1=where(((Data0055_result ge 0.0024) and (Data0047 ge 0.24)) or ((Data0138_result ge 0.0024) and (Data0138 ge 0.014)),/null)
+  ;BTH (Data0047 ge 0.24)
+  ;dh (Data0047 ge 0.4)
+  w1=where(((Data0055_result ge 0.0024) and (Data0047 ge 0.4)) or ((Data0138_result ge 0.0024) and (Data0138 ge 0.014)),/null)
   CloudData[w1]=15B
 
 ;  Data0047_result=get_std(Data0047,3,3)

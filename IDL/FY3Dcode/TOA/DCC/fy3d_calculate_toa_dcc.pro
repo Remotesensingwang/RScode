@@ -1,15 +1,17 @@
 ;coding=utf-8
 ;*****************************************************
-;对敦煌定标场进行TOA计算（以敦煌定标场中心点为中心，计算0.03°*0.03°范围的均值）
-;敦煌定标场的经纬度坐标为：39°51'34.7"N 94°41'27.6"E。
+;DCC提取
+;范围：（-20S - +20N   85E - 125E）
+;注意 这里限制了TOA的数据，其中对于于 0.7 以下的云反射率的观测值被丢弃
 ;*****************************************************
 
 pro fy3d_calculate_toa_DCC
   compile_opt idl2
-  input_directory='H:\00data\FY3D\FY3D_dunhuang\2021'
-  out_directory='H:\00data\FY3D\FY3D_dunhuang\tifout\removecloud\fycloudpro\2019\'
+  input_directory='H:\00data\FY3D\DCC\L1_data\00'
+  DestPath='H:\00data\FY3D\DCC\NANfilepath'
+  out_directory='H:\00data\FY3D\DCC_Test\base2\TOA\'
   ;文件日期 角度 匹配站点范围各个波段的toa均值
-  openw,lun,'H:\00data\TOA\FY3D\removecloud\fycloudpro\1kmstd\320(10km-6)\basetxt\DCC_dingbiao2021_fy3d10km_6_anglepos.txt',/get_lun,/append,width=500
+  openw,lun,'H:\00data\FY3D\DCC\TOA\DCC-0.8.txt',/get_lun,/append,width=500
   file_list_hdf=file_search(input_directory,'*_1000M_MS.HDF',count=file_n_hdf)
 
   ;*****************************************************文件批处理 *****************************************************
@@ -18,11 +20,11 @@ pro fy3d_calculate_toa_DCC
 
     ;获取文件的时间
     datetime=strmid(file_basename(file_list_hdf[file_i_hdf],'.hdf'),19,8)+strmid(file_basename(file_list_hdf[file_i_hdf],'.hdf'),28,4)
-
+;    hour=fix(strmid(datetime,8,2))   
     ;获取GEO文件的经纬度及四个角度数据
     basefile_i_geo=file_basename(file_list_hdf[file_i_hdf])
     strput, basefile_i_geo, "GEO1K_MS.HDF",33 ;字符串替换
-    file_i_geo= input_directory+'\'+basefile_i_geo
+    file_i_geo= input_directory+'\'+basefile_i_geo   
     lat=get_hdf5_data(file_i_geo,'/Geolocation/Latitude')
     lon=get_hdf5_data(file_i_geo,'/Geolocation/Longitude')
     ;pos=Spatial_matching(DCC_lon,DCC_lat,lon,lat) ;获取距离站点最近的经纬度下标
@@ -55,8 +57,9 @@ pro fy3d_calculate_toa_DCC
     DCC_va_angle=va_angle[col_min:col_max,line_min:line_max]
     DCC_ra_angle=ra_angle[col_min:col_max,line_min:line_max]
     if  count eq 0 or (col_max-col_min) lt 3 or (line_max-line_min) lt 3 then begin
-      ;print,file_basename(file_list_hdf[file_i_hdf])+'pos失败'+string(systime(1)-starttime1)+string(file_n_hdf-file_i_hdf-1)
-      print,file_basename(file_list_hdf[file_i_hdf])+'DCC范围提取失败'+string(file_n_hdf-file_i_hdf-1)
+      ;print,file_basename(file_list_hdf[file_i_hdf])+'pos失败'+string(systime(1)-starttime1)+string(file_n_hdf-file_i_hdf-1)      
+      file_delete,[file_list_hdf[file_i_hdf],file_i_geo]
+      print,file_basename(file_list_hdf[file_i_hdf])+'DCC范围提取失败,并删除成功'+string(file_n_hdf-file_i_hdf-1)
       continue
     endif
 
@@ -66,35 +69,53 @@ pro fy3d_calculate_toa_DCC
     TOA_ref_angle=[[[TOA_ref]],[[coor_angle_data]]] ;TOA_ref_angle为全幅影像，全波段的数据
     DCC_TOA_ref_angle=TOA_ref_angle[col_min:col_max,line_min:line_max,*] ;DCC_TOA_ref_angle为DCC范围的全波段数据
     
+;    write_tiff,out_directory+'TOAbase_0640.tiff',DCC_TOA_ref_angle,planarconfig=2,compression=1,/float;,GEOTIFF=GEOTIFF
+    
+    
     ;*****************************************************去云处理 只处理DCC范围的*************************************************************
     DBDT_DCC_FY3D,file_list_hdf[file_i_hdf],DCC_TOA_ref_angle,cloud_data,col_min=col_min,col_max=col_max,line_min=line_min,line_max=line_max,/area
-
+       
     cloud_pos=where(cloud_data ne 0)
-    angle_pos=where(cloud_data eq 0)
+    DCC_pos=where(cloud_data eq 0,count_DCC_pos)
+    
+    if count_DCC_pos eq 0  then begin
+      file_move,file_list_hdf[file_i_hdf],DestPath
+      file_move,file_i_geo,DestPath
+      print,file_basename(file_list_hdf[file_i_hdf])+'DCC范围数据为NAN,并移动成功'+string(file_n_hdf-file_i_hdf-1)
+      continue
+    endif
+    
     ;处理前4个波段的数据
     DCC_TOA_ref_mean=[]
     DCC_TOA_ref_std=[]
     for layer_i=0,3 do begin
       DCC_TOA_ref=DCC_TOA_ref_angle[*,*,layer_i]
+      fillvalue_pos=where(DCC_TOA_ref le 0.8 or DCC_TOA_ref ge 1,count)
+      if count gt 0 then   DCC_TOA_ref[fillvalue_pos]=!values.F_NAN
       DCC_TOA_ref[cloud_pos]=!VALUES.F_NAN
       DCC_TOA_ref_mean=[DCC_TOA_ref_mean,mean(DCC_TOA_ref,/nan)]
       DCC_TOA_ref_std=[DCC_TOA_ref_std,stddev(DCC_TOA_ref,/nan)]
       DCC_TOA_ref_angle[*,*,layer_i]=DCC_TOA_ref
     endfor
-
+    
+;    write_tiff,out_directory+'TOA_DCC_0640-1.tiff',DCC_TOA_ref_angle,planarconfig=2,compression=1,/float;,GEOTIFF=GEOTIFF
+    
+    
     DCC_Data0047=DCC_TOA_ref_angle[*,*,0]
     DCC_Data0047_size=size(DCC_Data0047)
     NotNaN_pos=WHERE(FINITE(DCC_Data0047),count_notnan)
-
+    
     if count_notnan eq 0  then begin
-      print,file_basename(file_list_hdf[file_i_hdf])+'敦煌站点数据为NAN'+string(file_n_hdf-file_i_hdf-1)
+      file_move,file_list_hdf[file_i_hdf],DestPath
+      file_move,file_i_geo,DestPath
+      print,file_basename(file_list_hdf[file_i_hdf])+'DCC范围数据为NAN1，并移动成功'+string(file_n_hdf-file_i_hdf-1)
       continue
     endif
 
     ;*****************************************************获取以站点为中心0.1°*0.1°范围内各波段表观反射率的均值 *****************************************************
 
-    ;获取敦煌站点0.1°范围内四个角度的均值
-    DCC_angle_mean=[mean(DCC_sz_angle[angle_pos]),mean(DCC_sa_angle[angle_pos]),mean(DCC_vz_angle[angle_pos]),mean(DCC_va_angle[angle_pos]),mean(DCC_ra_angle[angle_pos])]
+    ;获取DCC范围内四个角度的均值
+    DCC_angle_mean=[mean(DCC_sz_angle[NotNaN_pos]),mean(DCC_sa_angle[NotNaN_pos]),mean(DCC_vz_angle[NotNaN_pos]),mean(DCC_va_angle[NotNaN_pos]),mean(DCC_ra_angle[NotNaN_pos])]
 
     ;文件日期 角度 匹配站点范围各个波段的toa均值  ,逗号分隔
     data=[string(datetime),string(DCC_Data0047_size[4]),string(count_notnan),string(DCC_angle_mean),string(DCC_TOA_ref_mean),string(DCC_TOA_ref_std)]

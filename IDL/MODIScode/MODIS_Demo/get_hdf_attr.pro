@@ -14,6 +14,8 @@ function get_hdf_attr, filename, dataset_name, attr_name
   attr_index = hdf_sd_attrfind(dataset_id, attr_name)
   ; 获取属性内容
   hdf_sd_attrinfo, dataset_id, attr_index, data=attr_data
+  ;关闭数据集
+  hdf_sd_endaccess, dataset_id
   ; 关闭文件
   hdf_sd_end, file_id  ; 传入文件id
   ; 返回属性内容

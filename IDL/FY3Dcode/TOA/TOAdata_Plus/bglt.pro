@@ -1,13 +1,4 @@
 ;coding=GB2312
-;读取数据集数据
-function get_hdf5_data,hd_name,filename
-  file_id = H5F_OPEN(hd_name)
-  dataset_id=H5D_OPEN(file_id,filename)
-  data=H5D_READ(dataset_id)
-  return,data
-  h5d_close,dataset_id
-  h5d_close,file_id
-end
 
 ;●1读取经纬度数据集、目标数据集
 ;●2输出以上数据集

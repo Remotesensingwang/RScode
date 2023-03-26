@@ -79,7 +79,7 @@ pro cloud314,FY3DFile,TOAdata,CloudData,area=area,$
   ;去小于0的TOA值
   toadata_size=size(TOAdata)
   datapos=[]
-  for layer_i=1,6 do begin
+  for layer_i=1,3 do begin
     data=TOAdata[*,*,layer_i]
     pos=where(data le 0,count)
     if count gt 0 then begin

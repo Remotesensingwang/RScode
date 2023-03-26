@@ -1,41 +1,4 @@
 ;coding=utf-8
-;查找距离站点最近的坐标值下标
-function Spatial_matching,extract_lon,extract_lat,lon,lat
-  x=(lon-extract_lon)
-  y=(lat-extract_lat)
-  distance=sqrt(x^2+y^2)
-  min_dis=min(distance)
-  pos=where(distance eq min_dis)
-  
-  ;pos_col=pos mod 2048 ;pos的列（类型为数组）
-  ;pos_line=pos/2048    ;pos的行（类型为数组）
-  ;print,londata[pos_col,pos_line]
-  ;print,[pos_col,pos_line]
-  ;print,pos 
-  return,pos
-end
-
-;读取数据集数据
-function get_hdf5_data,hd_name,filename
-  file_id = H5F_OPEN(hd_name)
-  dataset_id=H5D_OPEN(file_id,filename)
-  data=H5D_READ(dataset_id)
-  return,data
-  h5d_close,dataset_id
-  h5d_close,file_id
-end
-
-;读取数据集标签属性值
-;hd_name=文件路径名称，filename=数据集具体标签名称，attr_name=具体标签的属性名称
-function get_hdf5_attr_data,hd_name,filename,attr_name
-  file_id = H5F_OPEN(hd_name)
-  dataset_id=H5D_OPEN(file_id,filename)
-  attr_id=H5A_OPEN_Name(dataset_id,attr_name)
-  data=H5A_READ(attr_id) ;获取属性值
-  return,data
-  h5d_close,dataset_id
-  h5d_close,file_id
-end
 
 ;获取太阳天顶角+站点匹配
 function get_Geo_info,file,Bejing_lon,Beijin_lat

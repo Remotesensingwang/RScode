@@ -100,19 +100,15 @@ FUNCTION MODIS_BRIGHT, RAD, BAND, UNITS
 
   ;- Compute brightness temperature
   if (units eq 1) then begin
-
     ;- Radiance units are
     ;- Watts per square meter per steradian per micron
     result = (bright_m(1.0e+4 / cwn[band - 20], rad) - $
       tci[band - 20]) / tcs[band - 20]
-
   endif else begin
-
     ;- Radiance units are
     ;- milliWatts per square meter per steradian per wavenumber
     result = (brite_m(cwn[band - 20], rad) - $
-      tci[band - 20]) / tcs[band - 20]
-
+      tci[band - 20]) / tcs[band - 20]    ;Watts/m^2/micrometer/steradian
   endelse
 
   ;- Return result to caller

@@ -81,7 +81,7 @@ pro modis_calculate_toa320
     ; print,string(col_max-col_min+1)+string(line_max-line_min+1)
 
     ;这里计算的是1-19，26波段的toa反射率（总共22个波段，13、14），但没有进行太阳天顶角的校正
-    MYD021KM_level1b_read,file_list_hdf[file_i_hdf],TOA_ref_nosz,/reflectance
+    MYD021KM_L1b_read,file_list_hdf[file_i_hdf],TOA_ref_nosz,/reflectance
     ;MYD021KM_level1b_read,file_list_hdf[file_i_hdf],sz_angle=sz_angle,toadata,/reflectance
 
     TOA_ref_nosz_angle=[[[TOA_ref_nosz]],[[coor_angle_data]]] ;为全幅影像，全波段的数据

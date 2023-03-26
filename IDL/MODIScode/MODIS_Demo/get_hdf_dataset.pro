@@ -11,6 +11,8 @@ function get_hdf_dataset,filename,dataset_name
   dataset_id=hdf_sd_select(file_id,dataset_index)
   ;获取数据集的内容
   hdf_sd_getdata,dataset_id,data
+  ;关闭数据集
+  hdf_sd_endaccess, dataset_id
   ;关闭文件
   hdf_sd_end, file_id  ; 传入文件id
   return,data

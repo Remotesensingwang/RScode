@@ -433,9 +433,10 @@ PRO MODIS_LEVEL1B_READ, FILENAME, BAND, IMAGE, $
   ; IF WE DON'T WANT RAW DATA -- TERRY HARAN 10/20/2000
 
   ;- Convert from unsigned short integer to signed long integer
-
   IF NOT KEYWORD_SET(raw) THEN BEGIN
-    image = TEMPORARY(image) AND 65535L
+    pos=where(image le valid_range[0] or image ge valid_range[1],count)
+;    pos=where(image le 0 or image ge 32767,count)
+;    image = TEMPORARY(image) AND 65535L
     valid_range = valid_range AND 65535L
   ENDIF
 
@@ -468,7 +469,11 @@ PRO MODIS_LEVEL1B_READ, FILENAME, BAND, IMAGE, $
     ENDIF
 
   ENDELSE
-
+  
+  if count gt 0 then begin
+    image[pos]=0
+  endif
+  
   ;- Get data range (min/max of valid image values)
   IF ARG_PRESENT(range) THEN BEGIN
     minval = MIN(image[valid_index], max=maxval)
