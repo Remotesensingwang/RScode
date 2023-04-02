@@ -13,7 +13,7 @@ from MODIS.Demofunction import timereolace
 # **************************************
 
 input_file=r'H:\00data\TOA\FY3D\removecloud\fycloudpro\20km\dh_dingbiao_modisd20km_4.xlsx'
-# input_file=r'H:\00data\TOA\MODIS\removecloud\2019\1kmstd\311(20km-4)\dh_dingbiao_modis20km-4-novz.xlsx'
+# input_file=r'H:\00data\TOA\MODIS\removecloud\2019\1kmstd\311(20km-4)\dh_dingbiao_modis20km-4-novz.xlsx'``
 
 # *****************************Excel文件数据读取*****************************
 df_base_1 = pd.read_excel(input_file, sheet_name="Sheet1")  # From an Excel file

@@ -1,0 +1,37 @@
+anaconda 虚拟环境的安装（tensorFlow）
+conda create --name tensorFlow python=3.7 anaconda
+
+删除虚拟环境
+conda remove --nametensorFlow --all
+
+删除库 
+pip uninstall xx
+
+激活环境
+activate tensorFlow
+
+结束环境
+deactivate tensorFlow
+
+检查下载的tensorflow-gpu是否可用
+tf.test.is_gpu_available() 可用为True
+
+更改jupyter notebook 工作目录
+先生成配置文件
+jupyter notebook --generate-config
+在配置文件里设置如下
+c.NotebookApp.notebook_dir = 'D:\Jupyterfile'
+
+keras.utils.plot_model报错解决
+1.https://graphviz.org/download/ 下载graphviz（设置环境变量）
+2.ananconda(tensorflow)界面
+pip install pydotplus
+pip install graphviz
+就可以咯
+
+
+下载TensorFlow
+pip install tensorflow -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
+更新最新版本的TensorFlow：pip install --upgrade --ignore-installed tensorflow
+下载Keras
+pip install keras

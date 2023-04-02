@@ -8,23 +8,31 @@
 pro fy3d_calculate_toa_DCC
   compile_opt idl2
   input_directory='H:\00data\FY3D\DCC\L1_data\00'
-  DestPath='H:\00data\FY3D\DCC\NANfilepath'
-  out_directory='H:\00data\FY3D\DCC_Test\base2\TOA\'
+  DestPath='H:\00data\FY3D\DCC\L1_data_NAN'
+  out_directory='H:\00data\FY3D\DCC\L1_data\00\'
   ;文件日期 角度 匹配站点范围各个波段的toa均值
-  openw,lun,'H:\00data\FY3D\DCC\TOA\DCC-0.8.txt',/get_lun,/append,width=500
+  openw,lun,'H:\00data\FY3D\DCC\TOA\0.8\DCC-0.8-8.1-11.6.txt',/get_lun,/append,width=500
   file_list_hdf=file_search(input_directory,'*_1000M_MS.HDF',count=file_n_hdf)
 
   ;*****************************************************文件批处理 *****************************************************
   for file_i_hdf=0,file_n_hdf-1 do begin
     starttime1=systime(1)
-
+    
+    ;错误文件的捕捉
+    Catch, errorStatus
+    if (errorStatus NE 0) then begin
+      Catch, /CANCEL
+      print,file_list_hdf[file_i_hdf]+'有问题'
+      continue
+    endif
+       
     ;获取文件的时间
     datetime=strmid(file_basename(file_list_hdf[file_i_hdf],'.hdf'),19,8)+strmid(file_basename(file_list_hdf[file_i_hdf],'.hdf'),28,4)
 ;    hour=fix(strmid(datetime,8,2))   
     ;获取GEO文件的经纬度及四个角度数据
     basefile_i_geo=file_basename(file_list_hdf[file_i_hdf])
     strput, basefile_i_geo, "GEO1K_MS.HDF",33 ;字符串替换
-    file_i_geo= input_directory+'\'+basefile_i_geo   
+    file_i_geo= input_directory+'\'+basefile_i_geo     
     lat=get_hdf5_data(file_i_geo,'/Geolocation/Latitude')
     lon=get_hdf5_data(file_i_geo,'/Geolocation/Longitude')
     ;pos=Spatial_matching(DCC_lon,DCC_lat,lon,lat) ;获取距离站点最近的经纬度下标
@@ -69,7 +77,7 @@ pro fy3d_calculate_toa_DCC
     TOA_ref_angle=[[[TOA_ref]],[[coor_angle_data]]] ;TOA_ref_angle为全幅影像，全波段的数据
     DCC_TOA_ref_angle=TOA_ref_angle[col_min:col_max,line_min:line_max,*] ;DCC_TOA_ref_angle为DCC范围的全波段数据
     
-;    write_tiff,out_directory+'TOAbase_0640.tiff',DCC_TOA_ref_angle,planarconfig=2,compression=1,/float;,GEOTIFF=GEOTIFF
+;    write_tiff,out_directory+'TOAbase_0745.tiff',DCC_TOA_ref_angle,planarconfig=2,compression=1,/float;,GEOTIFF=GEOTIFF
     
     
     ;*****************************************************去云处理 只处理DCC范围的*************************************************************
@@ -98,7 +106,8 @@ pro fy3d_calculate_toa_DCC
       DCC_TOA_ref_angle[*,*,layer_i]=DCC_TOA_ref
     endfor
     
-;    write_tiff,out_directory+'TOA_DCC_0640-1.tiff',DCC_TOA_ref_angle,planarconfig=2,compression=1,/float;,GEOTIFF=GEOTIFF
+    ;planarconfig=2(BSQ) 说明导入的数据是（列，行，通道数）这也是IDL的常用的，用envi打开格式为（2048 x 2000 x 4）,matlab打开格式为（2000，2048，4）
+;    write_tiff,out_directory+'TOA_DCC_0745.tiff',DCC_TOA_ref_angle,planarconfig=2,compression=1,/float;,GEOTIFF=GEOTIFF
     
     
     DCC_Data0047=DCC_TOA_ref_angle[*,*,0]
@@ -120,8 +129,6 @@ pro fy3d_calculate_toa_DCC
     ;文件日期 角度 匹配站点范围各个波段的toa均值  ,逗号分隔
     data=[string(datetime),string(DCC_Data0047_size[4]),string(count_notnan),string(DCC_angle_mean),string(DCC_TOA_ref_mean),string(DCC_TOA_ref_std)]
     printf,lun,strcompress(data,/remove_all);,format='(25(a,:,","))'
-    ;result_tiff_name=out_directory+strmid(file_basename(file_list_hdf[file_i_hdf],'.hdf'),19,13)+'_TOA_1km.tif'
-    ;write_tiff,result_tiff_name,TOA_ref,planarconfig=2,compression=1,/float   ;planarconfig=2(BSQ) 说明导入的数据是（列，行，通道数）这也是IDL的常用的，用envi打开格式为（2048 x 2000 x 4）,matlab打开格式为（2000，2048，4）
     print,file_basename(file_list_hdf[file_i_hdf])+STRCOMPRESS(string(mean(DCC_lon)))+STRCOMPRESS(string(mean(DCC_lat)))+string(systime(1)-starttime1)+string(file_n_hdf-file_i_hdf-1)
 
     sz_angle=!null

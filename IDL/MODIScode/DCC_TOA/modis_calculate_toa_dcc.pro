@@ -7,16 +7,24 @@
 
 pro modis_calculate_toa_DCC
   compile_opt idl2
-  input_directory='H:\00data\MODIS\DCC\DCC_L1data' ;
+  input_directory='H:\00data\MODIS\DCC\DCC_L1data\2020' ;
   out_directory='C:\Users\lenovo\Downloads\DCC\01\tiff\'
-
+  DestPath='H:\00data\MODIS\DCC\DCC_NAN\2020'
   ;文件日期 角度 匹配站点范围各个波段的toa均值 
-  openw,lun,'H:\00data\MODIS\DCC\TOA\DCC_2019_modis-2-le0.7.txt',/get_lun,/append,width=500
+  openw,lun,'H:\00data\MODIS\DCC\TOA\0.8\DCC_2020_modis-0.8.txt',/get_lun,/append,width=500
 
   file_list_hdf=file_search(input_directory,'*.HDF',count=file_n_hdf)
   for file_i_hdf=0,file_n_hdf-1 do begin
     starttime1=systime(1)
-
+    
+    ;错误文件的捕捉
+    Catch, errorStatus
+    if (errorStatus NE 0) then begin
+      Catch, /CANCEL
+      print,file_list_hdf[file_i_hdf]+'有问题'
+      continue
+    endif
+    
     ;获取文件的时间、经纬度、四个角度
     ;datetime=strmid(file_basename(file_list_hdf[file_i_hdf],'.hdf'),10,7)+strmid(file_basename(file_list_hdf[file_i_hdf],'.hdf'),18,4) 
     out_year_fix=fix(strmid(file_basename(file_list_hdf[file_i_hdf],'.hdf'),10,4))
@@ -60,9 +68,9 @@ pro modis_calculate_toa_DCC
     line_max=max(pos_line)
     s= file_list_hdf[file_i_hdf]
                                    
-    if col_max-col_min lt 3 or line_max-line_min lt 3 or count eq 0 then begin
-      print,file_basename(file_list_hdf[file_i_hdf])+'DCC提取失败'+string(file_n_hdf-file_i_hdf-1)
+    if col_max-col_min lt 3 or line_max-line_min lt 3 or count eq 0 then begin      
       file_delete,file_list_hdf[file_i_hdf]
+      print,file_basename(file_list_hdf[file_i_hdf])+'DCC提取失败,并删除成功！'+string(file_n_hdf-file_i_hdf-1)
       continue
     endif
     
@@ -84,7 +92,8 @@ pro modis_calculate_toa_DCC
     DCC_pos=where(cloud_data eq 0,count_DCC_pos)
 
     if count_DCC_pos eq 0  then begin
-      print,file_basename(file_list_hdf[file_i_hdf])+'DCC范围数据内没有有效值'+string(file_n_hdf-file_i_hdf-1)
+      file_move,file_list_hdf[file_i_hdf],DestPath
+      print,file_basename(file_list_hdf[file_i_hdf])+'DCC范围数据内没有有效值,并移动成功！'+string(file_n_hdf-file_i_hdf-1)
       continue
     endif
         
@@ -92,7 +101,7 @@ pro modis_calculate_toa_DCC
     DCC_TOA_ref_std=[]
     for band=0,3 do begin
       DCC_TOA_ref=DCC_TOA_ref_angle[*,*,band]
-      fillvalue_pos=where(DCC_TOA_ref le 0.7 or DCC_TOA_ref ge 1,count)
+      fillvalue_pos=where(DCC_TOA_ref le 0.8 or DCC_TOA_ref ge 1,count)
       if count gt 0 then   DCC_TOA_ref[fillvalue_pos]=!values.F_NAN 
       DCC_TOA_ref[cloud_pos]=!values.F_NAN
       ;DCC_TOA_ref[where(DCC_TOA_ref le 0)]=!values.F_NAN
@@ -106,7 +115,8 @@ pro modis_calculate_toa_DCC
     NotNaN_pos=WHERE(FINITE(DCC_Data0047),count_notnan)
     
     if count_notnan eq 0  then begin
-      print,file_basename(file_list_hdf[file_i_hdf])+'DCC数据为NAN'+string(file_n_hdf-file_i_hdf-1)
+      file_move,file_list_hdf[file_i_hdf],DestPath
+      print,file_basename(file_list_hdf[file_i_hdf])+'DCC数据为NAN,并移动成功！'+string(file_n_hdf-file_i_hdf-1)
       continue
     endif
     

@@ -5,13 +5,13 @@
 ;范围选取：
 ;*****************************************************
 
-pro modis_calculate_toa320
+pro modis_calculate_toa317,input_directory=input_directory
   compile_opt idl2
   input_directory='H:\00data\MODIS\MODIS_L1data\2021'
-  out_directory='H:\00data\TOA\MODIS\removecloud\2019\1kmstd\tiff\'
+;  out_directory='H:\00data\TOA\MODIS\removecloud\2019\1kmstd\tiff\'
 
   ;文件日期 角度 匹配站点范围各个波段的toa均值
-  ;openw,lun,'H:\00data\TOA\MODIS\removecloud\2019\1kmstd\317(10km-6)\basetxt\dh_dingbiao2021_modis10km_6.txt',/get_lun,/append,width=500
+  openw,lun,'H:\00data\TOA\MODIS\removecloud\2019\1kmstd\317(10km-6)\basetxt\dh_dingbiao2021_modis10km_6.txt',/get_lun,/append,width=500
   ;敦煌定标场中心坐标
   dh_lon=94.27
   dh_lat=40.18
@@ -51,7 +51,7 @@ pro modis_calculate_toa320
 
     ;*******************************提取敦煌地区范围的数据********************************************
     ;pos=where((lon ge 93.5) and (lon le 95) and (lat ge 39.5)and(lat le 41),count)
-    ;pos=where((lon ge 94.216) and (lon le 94.416) and (lat ge 40.002)and(lat le 40.202),count)
+;    pos=where((lon ge 94.216) and (lon le 94.416) and (lat ge 40.002)and(lat le 40.202),count)
     pos=where((lon ge 94.284) and (lon le 94.384) and (lat ge 40.044)and(lat le 40.144),count)
     
     ;提取敦煌地区范围的行列号
@@ -63,19 +63,19 @@ pro modis_calculate_toa320
     line_min=min(pos_line)
     line_max=max(pos_line)
 
-    ;提取敦煌地区范围的经纬度、几何角度信息
-    ;dh_lon=lon[col_min:col_max,line_min:line_max]
-    ;dh_lat=lat[col_min:col_max,line_min:line_max]
-    dh_sz_angle=sz_angle[col_min:col_max,line_min:line_max]
-    ;dh_sa_angle=sa_angle[col_min:col_max,line_min:line_max]
-    ;dh_vz_angle=vz_angle[col_min:col_max,line_min:line_max]
-    ;dh_va_angle=va_angle[col_min:col_max,line_min:line_max]
-    ;dh_ra_angle=ra_angle[col_min:col_max,line_min:line_max]   
-
     if count eq 0 or (col_max-col_min) lt 3 or (line_max-line_min) lt 3 then begin
       print,file_basename(file_list_hdf[file_i_hdf])+'敦煌范围提取失败'+string(file_n_hdf-file_i_hdf-1)
       continue
     endif
+        
+    ;提取敦煌地区范围的经纬度、几何角度信息
+    dh_lon=lon[col_min:col_max,line_min:line_max]
+    dh_lat=lat[col_min:col_max,line_min:line_max]
+    dh_sz_angle=sz_angle[col_min:col_max,line_min:line_max]
+    dh_sa_angle=sa_angle[col_min:col_max,line_min:line_max]
+    dh_vz_angle=vz_angle[col_min:col_max,line_min:line_max]
+    dh_va_angle=va_angle[col_min:col_max,line_min:line_max]
+    dh_ra_angle=ra_angle[col_min:col_max,line_min:line_max]
 
     ;dh_toa=toadata[col_min:col_max,line_min:line_max,0:6]
     ; print,string(col_max-col_min+1)+string(line_max-line_min+1)
@@ -97,7 +97,6 @@ pro modis_calculate_toa320
     dh_TOA_ref_mean=[]
     dh_TOA_ref_std=[]
 
-
     ;处理前4个波段的数据
     for layer_i=0,3 do begin
       dh_TOA_ref=dh_TOA_ref_nosz_angle[*,*,layer_i]/cos(dh_sz_angle*!dtor) ;敦煌地区的toa反射率
@@ -117,13 +116,12 @@ pro modis_calculate_toa320
       continue
     endif
 
-
     ;获取敦煌范围内四个角度的均值
-    dh_angle_mean=[mean(dh_TOA_ref_nosz_angle[*,*,-7]),mean(dh_TOA_ref_nosz_angle[*,*,-6]),mean(dh_TOA_ref_nosz_angle[*,*,-5]),mean(dh_TOA_ref_nosz_angle[*,*,-4]),mean(dh_TOA_ref_nosz_angle[*,*,-3])]
+    dh_angle_mean=[mean(dh_sz_angle[NotNaN_pos]),mean(dh_sa_angle[NotNaN_pos]),mean(dh_vz_angle[NotNaN_pos]),mean(dh_va_angle[NotNaN_pos]),mean(dh_ra_angle[NotNaN_pos])]
 
     ;文件日期 角度 匹配站点范围各个波段的toa均值  ,逗号分隔
     data=[string(datetime),string(dh_Data0064_size[4]),string(count_notnan),string(dh_angle_mean),string(dh_TOA_ref_mean),string(dh_TOA_ref_std)]
-    ;printf,lun,strcompress(data,/remove_all);,format='(25(a,:,","))'
+    printf,lun,strcompress(data,/remove_all);,format='(25(a,:,","))'
 
     print,file_basename(file_list_hdf[file_i_hdf])+STRCOMPRESS(string(mean(dh_TOA_ref_nosz_angle[*,*,-2])))+STRCOMPRESS(string(mean(dh_TOA_ref_nosz_angle[*,*,-1])))+string(systime(1)-starttime1)+string(file_n_hdf-file_i_hdf-1)
 
@@ -153,6 +151,6 @@ pro modis_calculate_toa320
     dh_TOA_ref_mean=!null
     dh_TOA_ref_std=!null
   endfor
-  ;free_lun,lun
+  free_lun,lun
   print,'所有文件提取完成'
 end

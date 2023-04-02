@@ -37,7 +37,7 @@ pro MYD021KM_L1b_read,MYD021KMFile,imagedata,$
   ;计算TOA   R=reflectance_scale*(DN-reflectance _offset)
   if keyword_set(reflectance) then begin
     for layer_i=0,DN_band_data_size[3]-1 do begin
-      imagedata[*,*,layer_i]=(DN_band_data[*,*,layer_i] gt 0 and DN_band_data[*,*,layer_i] lt 32767)*scales_band_data[layer_i]*(DN_band_data[*,*,layer_i]-offsets_band_data[layer_i])
+      imagedata[*,*,layer_i]=(DN_band_data[*,*,layer_i] gt 0 and DN_band_data[*,*,layer_i] le 32767)*scales_band_data[layer_i]*(DN_band_data[*,*,layer_i]-offsets_band_data[layer_i])
     endfor
   endif
 

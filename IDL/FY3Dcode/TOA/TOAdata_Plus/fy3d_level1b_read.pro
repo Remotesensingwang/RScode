@@ -38,11 +38,11 @@ pro fy3d_level1b_read,FY3DFile,imagedata,$
     ;band_data_ref=fltarr(band_data_size[1],band_data_size[2],band_data_size[3])
     imagedata=fltarr(band_data_size[1],band_data_size[2],band_data_size[3])
  
-;    for layer_i=0,band_data_size[3]-1 do begin
-    for layer_i=0,3 do begin
+    for layer_i=0,band_data_size[3]-1 do begin
+;    for layer_i=0,3 do begin
       band_data_dn=refSB_band_data[*,*,layer_i]*refSB_band_slope[layer_i]+refSB_band_Intercept[layer_i]
       band_data_ref=cal_2[layer_i]*band_data_dn^2.0+cal_1[layer_i]*band_data_dn+cal_0[layer_i]
-      imagedata[*,*,layer_i]=(refSB_band_data[*,*,layer_i] gt 0 and refSB_band_data[*,*,layer_i] lt 4095)*(earthsun_distance_ratio[0]^2*band_data_ref)/cos(sz_angle*!dtor)*0.01      
+      imagedata[*,*,layer_i]=(refSB_band_data[*,*,layer_i] gt 0 and refSB_band_data[*,*,layer_i] le 4095)*(earthsun_distance_ratio[0]^2*band_data_ref)/cos(sz_angle*!dtor)*0.01      
     endfor
     
     h5f_close,file_id
@@ -71,18 +71,17 @@ pro fy3d_level1b_read,FY3DFile,imagedata,$
     c2=1.4387752   ;c2=1.438833  ;（一种基于FY3D/MERSI2的AOD遥感反演方法 ）（FY3MERSI地表温度反演和专题制图的MATLAB 实现）
     
     ;获取热红外波段的有效值的范围 其中1KM为20-23波段,250m为24-25波段
-    valid_range_1KM=get_hdf5_attr_data(file,'/Data/EV_1KM_Emissive','valid_range')
-    valid_range_250M=get_hdf5_attr_data(file,'/Data/EV_250_Aggr.1KM_Emissive','valid_range')
+;    valid_range_1KM=get_hdf5_attr_data(file,'/Data/EV_1KM_Emissive','valid_range')
+;    valid_range_250M=get_hdf5_attr_data(file,'/Data/EV_250_Aggr.1KM_Emissive','valid_range')
 ;    HELP,valid_range_1KM[0]
     for layer_i=0,Emissive_band_data_size[3]-1 do begin
       Rad_data=Emissive_band_data[*,*,layer_i]*Emissive_band_slope[layer_i]+Emissive_band_Intercept[layer_i]
       Te_data=(c2*mersi_equivmid_wn_data[layer_i])/(alog(1+c1*mersi_equivmid_wn_data[layer_i]^3/Rad_data))   
       if layer_i lt 4 then begin
-        imagedata[*,*,layer_i]=(Emissive_band_data[*,*,layer_i] gt valid_range_1KM[0] and Emissive_band_data[*,*,layer_i] lt valid_range_1KM[1])*(Te_data*tbbcorr_coeff_a_data[layer_i]+tbbcorr_coeff_b_data[layer_i])
+        imagedata[*,*,layer_i]=(Emissive_band_data[*,*,layer_i] gt 0 and Emissive_band_data[*,*,layer_i] le 65530)*(Te_data*tbbcorr_coeff_a_data[layer_i]+tbbcorr_coeff_b_data[layer_i])
       endif else begin
-        imagedata[*,*,layer_i]=(Emissive_band_data[*,*,layer_i] gt valid_range_250M[0] and Emissive_band_data[*,*,layer_i] lt valid_range_250M[1])*(Te_data*tbbcorr_coeff_a_data[layer_i]+tbbcorr_coeff_b_data[layer_i])
-      endelse
-      
+        imagedata[*,*,layer_i]=(Emissive_band_data[*,*,layer_i] gt 0 and Emissive_band_data[*,*,layer_i] le 25000)*(Te_data*tbbcorr_coeff_a_data[layer_i]+tbbcorr_coeff_b_data[layer_i])
+      endelse      
     endfor
   endif
   

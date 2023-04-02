@@ -39,7 +39,9 @@ pro DBDT_DCC_FY3D,FY3DFile,TOAdata,CloudData,area=area,$
   ;设置非背景值为0
 ;  CloudData[WHERE(Data0047 GT 0 AND Data0047 LT 1)] = 0B  ; 有效值为0
   CloudData[WHERE(Data1080 GT 0)] = 0B  ; 有效值为0
-  
+;  m=max(data1080)
+;  print,m
+;  write_tiff,'H:\00data\FY3D\DCC\L1_data\00\data1080-0745.tiff',data1080,planarconfig=2,compression=1,/float;,GEOTIFF=GEOTIFF
   std_nan=WHERE(~FINITE(Data0047_std) or ~FINITE(Data0055_std) or ~FINITE(Data0065_std) or ~FINITE(Data0087_std) or ~FINITE(Data1080_std),count)
   if count gt 0 then begin
     CloudData[std_nan]=10B
@@ -68,10 +70,10 @@ pro DBDT_DCC_FY3D,FY3DFile,TOAdata,CloudData,area=area,$
 ;    clouddata[var_datapos]=80B
 ;  endif
   
-  out_directory='H:\00data\FY3D\DCC_Test\base2\TOA\'
-  result_tiff_name=out_directory+'Data1120_0640.tiff'
+;  out_directory='H:\00data\FY3D\DCC\L1_data\00\'
+;  result_tiff_name=out_directory+'Data1120_0640.tiff'
 ;  write_tiff,result_tiff_name,Data1080,planarconfig=2,compression=1,/float;,GEOTIFF=GEOTIFF  
-;  write_tiff,out_directory+'CloudData_0640-1.tiff',CloudData,planarconfig=2,compression=1,/float;,GEOTIFF=GEOTIFF
+;  write_tiff,out_directory+'CloudData-0745.tiff',CloudData,planarconfig=2,compression=1,/float;,GEOTIFF=GEOTIFF
   
   
 end
