@@ -25,6 +25,11 @@ pro modis_calculate_toa_DCC
       continue
     endif
     
+    ;获取1-19波段,26波段的DN值
+    EV_250_RefSB_data=get_hdf_dataset(file_list_hdf[file_i_hdf],'EV_250_Aggr1km_RefSB') ;1-2波段
+    ;获取SI数据的列、行号（有时行号为2030，有时为2040）
+    DN_band_data_size=size(EV_250_RefSB_data)
+    
     ;获取文件的时间、经纬度、四个角度
     ;datetime=strmid(file_basename(file_list_hdf[file_i_hdf],'.hdf'),10,7)+strmid(file_basename(file_list_hdf[file_i_hdf],'.hdf'),18,4) 
     out_year_fix=fix(strmid(file_basename(file_list_hdf[file_i_hdf],'.hdf'),10,4))
@@ -34,22 +39,32 @@ pro modis_calculate_toa_DCC
     imsl_daystodate,date_julian+out_day_fix,day,month,year;将儒略日转化为日期  
     date=[year,month,day,out_hour_fix]
     datetime=strcompress(date.ToString('(I0,I02,I02,I04)'),/remove_all)
-    
-    ;获取1-19波段,26波段的DN值
-    EV_250_RefSB_data=get_hdf_dataset(file_list_hdf[file_i_hdf],'EV_250_Aggr1km_RefSB') ;1-2波段
-
-    ;获取SI数据的列、行号（有时行号为2030，有时为2040）
-    DN_band_data_size=size(EV_250_RefSB_data)
-
-    ;经纬度、四个角度数据重采样 插值方法为双线性插值法（interp）   
-    lat=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'Latitude'),DN_band_data_size[1],DN_band_data_size[2],/interp)
-    lon=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'Longitude'),DN_band_data_size[1],DN_band_data_size[2],/interp)
-    sz_angle=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'SolarZenith'),DN_band_data_size[1],DN_band_data_size[2],/interp)*0.01   ;太阳天顶角
-    sa_angle=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'SolarAzimuth'),DN_band_data_size[1],DN_band_data_size[2],/interp)*0.01  ;太阳方位角
-    vz_angle=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'SensorZenith'),DN_band_data_size[1],DN_band_data_size[2],/interp)*0.01  ;观测天顶角
-    va_angle=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'SensorAzimuth'),DN_band_data_size[1],DN_band_data_size[2],/interp)*0.01 ;观测方位角
+       
+    ;*******************************读取MYD03数据，提取经纬度及四个角度********************************************
+    basefile_i=strmid(file_basename(file_list_hdf[file_i_hdf],'.hdf'),8,18)
+    file_i_geo='MYD03'+basefile_i+'.hdf'
+    file_i_geo= input_directory_GEO+'\'+file_i_geo
+    lat=get_hdf_dataset(file_i_geo,'Latitude')
+    lon=get_hdf_dataset(file_i_geo,'Longitude')
+    ;pos=Spatial_matching(dh_lon,dh_lat,lon,lat) ;获取距离站点最近的经纬度下标
+    sz_angle=get_hdf_dataset(file_i_geo,'SolarZenith')*0.01;太阳天顶角
+    sa_angle=get_hdf_dataset(file_i_geo,'SolarAzimuth')*0.01;太阳方位角
+    vz_angle=get_hdf_dataset(file_i_geo,'SensorZenith')*0.01;观测天顶角
+    va_angle=get_hdf_dataset(file_i_geo,'SensorAzimuth')*0.01;观测方位角
     ra_angle = abs(sa_angle - va_angle)
     ra_angle = (ra_angle le 180.0) * ra_angle + (ra_angle gt 180.0) * (360.0 - ra_angle)  ;相对方位角
+    ;太阳耀斑角
+    ;    sca_angle_cos = -(cos(vz_angle * !DTOR) * cos(sz_angle * !DTOR) + sin(vz_angle * !DTOR) * sin(sz_angle * !DTOR) * cos(ra_angle * !DTOR))
+    ;    sca_angle = acos(sca_angle_cos) / !DTOR
+    ;*******************************经纬度及四个角度进行插值(双线性插值法(interp))，不需要MYD03产品******************************************** 
+;    lat=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'Latitude'),DN_band_data_size[1],DN_band_data_size[2],/interp)
+;    lon=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'Longitude'),DN_band_data_size[1],DN_band_data_size[2],/interp)
+;    sz_angle=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'SolarZenith'),DN_band_data_size[1],DN_band_data_size[2],/interp)*0.01   ;太阳天顶角
+;    sa_angle=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'SolarAzimuth'),DN_band_data_size[1],DN_band_data_size[2],/interp)*0.01  ;太阳方位角
+;    vz_angle=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'SensorZenith'),DN_band_data_size[1],DN_band_data_size[2],/interp)*0.01  ;观测天顶角
+;    va_angle=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'SensorAzimuth'),DN_band_data_size[1],DN_band_data_size[2],/interp)*0.01 ;观测方位角
+;    ra_angle = abs(sa_angle - va_angle)
+;    ra_angle = (ra_angle le 180.0) * ra_angle + (ra_angle gt 180.0) * (360.0 - ra_angle)  ;相对方位角
     ;太阳耀斑角
 ;    sca_angle_cos = -(cos(vz_angle * !DTOR) * cos(sz_angle * !DTOR) + sin(vz_angle * !DTOR) * sin(sz_angle * !DTOR) * cos(ra_angle * !DTOR))
 ;    sca_angle = acos(sca_angle_cos) / !DTOR

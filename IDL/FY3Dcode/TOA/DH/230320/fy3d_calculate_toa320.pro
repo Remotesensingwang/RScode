@@ -21,7 +21,15 @@ pro fy3d_calculate_toa320,input_directory=input_directory
   ;*****************************************************文件批处理 *****************************************************
   for file_i_hdf=0,file_n_hdf-1 do begin
     starttime1=systime(1)
-
+   
+    ;错误文件的捕捉
+    Catch, errorStatus
+    if (errorStatus NE 0) then begin
+      Catch, /CANCEL
+      print,!ERROR_STATE.Msg+'有问题'
+      continue
+    endif
+    
     ;获取文件的时间
     datetime=strmid(file_basename(file_list_hdf[file_i_hdf],'.hdf'),19,8)+strmid(file_basename(file_list_hdf[file_i_hdf],'.hdf'),28,4)
 

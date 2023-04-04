@@ -1,3 +1,4 @@
+# coding=utf-8
 # src_dir 需要复制、移动的文件的根文件夹
 # dst_dir  移动之后的路径
 

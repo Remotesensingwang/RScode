@@ -8,7 +8,7 @@
 pro modis_calculate_toa326,input_directory=input_directory
   compile_opt idl2
   input_directory='H:\00data\MODIS\MODIS_L1data\2019'
-  
+  input_directory_GEO=''
   ;文件日期 角度 匹配站点范围各个波段的toa均值
   openw,lun,'H:\00data\TOA\MODIS\removecloud\2019\1kmstd\326(20km)\dh_dingbiao2019_modis20km.txt',/get_lun,/append,width=500
   ;敦煌定标场中心坐标
@@ -44,14 +44,29 @@ pro modis_calculate_toa326,input_directory=input_directory
     date=[year,month,day,out_hour_fix]
     datetime=strcompress(date.ToString('(I0,I02,I02,I04)'),/remove_all)
 
-    lat=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'Latitude'),DN_band_data_size[1],DN_band_data_size[2],/interp)
-    lon=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'Longitude'),DN_band_data_size[1],DN_band_data_size[2],/interp)
-    sz_angle=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'SolarZenith'),DN_band_data_size[1],DN_band_data_size[2],/interp)*0.01   ;太阳天顶角
-    sa_angle=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'SolarAzimuth'),DN_band_data_size[1],DN_band_data_size[2],/interp)*0.01  ;太阳方位角
-    vz_angle=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'SensorZenith'),DN_band_data_size[1],DN_band_data_size[2],/interp)*0.01  ;观测天顶角
-    va_angle=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'SensorAzimuth'),DN_band_data_size[1],DN_band_data_size[2],/interp)*0.01 ;观测方位角
+    ;*******************************读取MYD03数据，提取经纬度及四个角度********************************************
+    basefile_i=strmid(file_basename(file_list_hdf[file_i_hdf],'.hdf'),8,18)
+    file_i_geo='MYD03'+basefile_i+'.hdf'
+    file_i_geo= input_directory_GEO+'\'+file_i_geo
+    lat=get_hdf_dataset(file_i_geo,'Latitude')
+    lon=get_hdf_dataset(file_i_geo,'Longitude')
+    ;pos=Spatial_matching(dh_lon,dh_lat,lon,lat) ;获取距离站点最近的经纬度下标
+    sz_angle=get_hdf_dataset(file_i_geo,'SolarZenith')*0.01;太阳天顶角
+    sa_angle=get_hdf_dataset(file_i_geo,'SolarAzimuth')*0.01;太阳方位角
+    vz_angle=get_hdf_dataset(file_i_geo,'SensorZenith')*0.01;观测天顶角
+    va_angle=get_hdf_dataset(file_i_geo,'SensorAzimuth')*0.01;观测方位角
     ra_angle = abs(sa_angle - va_angle)
     ra_angle = (ra_angle le 180.0) * ra_angle + (ra_angle gt 180.0) * (360.0 - ra_angle)  ;相对方位角
+
+    ;*******************************经纬度及四个角度进行插值(双线性插值法(interp))，不需要MYD03产品********************************************
+;    lat=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'Latitude'),DN_band_data_size[1],DN_band_data_size[2],/interp)
+;    lon=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'Longitude'),DN_band_data_size[1],DN_band_data_size[2],/interp)
+;    sz_angle=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'SolarZenith'),DN_band_data_size[1],DN_band_data_size[2],/interp)*0.01   ;太阳天顶角
+;    sa_angle=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'SolarAzimuth'),DN_band_data_size[1],DN_band_data_size[2],/interp)*0.01  ;太阳方位角
+;    vz_angle=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'SensorZenith'),DN_band_data_size[1],DN_band_data_size[2],/interp)*0.01  ;观测天顶角
+;    va_angle=congrid(get_hdf_dataset(file_list_hdf[file_i_hdf],'SensorAzimuth'),DN_band_data_size[1],DN_band_data_size[2],/interp)*0.01 ;观测方位角
+;    ra_angle = abs(sa_angle - va_angle)
+;    ra_angle = (ra_angle le 180.0) * ra_angle + (ra_angle gt 180.0) * (360.0 - ra_angle)  ;相对方位角
 
     coor_angle_data=[[[sz_angle]],[[sa_angle]],[[vz_angle]],[[va_angle]],[[ra_angle]],[[lon]],[[lat]]]
 

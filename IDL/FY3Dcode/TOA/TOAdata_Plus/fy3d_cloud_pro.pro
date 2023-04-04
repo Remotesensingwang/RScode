@@ -122,7 +122,7 @@ pro FY3D_cloud_pro,FY3DFile,TOAdata,CloudData,area=area,$
   CloudData[angle]=200B
   
 ;  datetime=strmid(file_basename(FY3DFile,'.hdf'),19,8)+strmid(file_basename(FY3DFile,'.hdf'),28,4)
-;  out_dir='H:\00data\FY3D\FY3D_dunhuang\test\tiff\'  
+;  out_dir='H:\00data\FY3D\FY3D_Sea\2019\tiff\cloud\'  
 ;  write_tiff,out_dir+datetime+'CloudData.tiff',CloudData,planarconfig=2,/float
 end
 

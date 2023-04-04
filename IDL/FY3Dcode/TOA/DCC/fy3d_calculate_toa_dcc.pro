@@ -22,7 +22,7 @@ pro fy3d_calculate_toa_DCC
     Catch, errorStatus
     if (errorStatus NE 0) then begin
       Catch, /CANCEL
-      print,file_list_hdf[file_i_hdf]+'有问题'
+      print,!ERROR_STATE.Msg+'有问题'
       continue
     endif
        

@@ -25,7 +25,7 @@ pro fy3d_calculate_toa326,input_directory=input_directory
     Catch, errorStatus
     if (errorStatus NE 0) then begin
       Catch, /CANCEL
-      print,file_list_hdf[file_i_hdf]+'有问题'
+      print,!ERROR_STATE.Msg+'有问题'
       continue
     endif
 
@@ -33,7 +33,7 @@ pro fy3d_calculate_toa326,input_directory=input_directory
     datetime=strmid(file_basename(file_list_hdf[file_i_hdf],'.hdf'),19,8)+strmid(file_basename(file_list_hdf[file_i_hdf],'.hdf'),28,4)
     ;获取GEO文件的经纬度及四个角度数据
     basefile_i_geo=file_basename(file_list_hdf[file_i_hdf])
-    strput, basefile_i_geo, "GEO1K_MS.HDF",33 ;字符串替换
+    strput, basefile_i_geo, "GEO1K_MS.HDF",33 ;字符串替换     ;basefile_i_geo=basefile_i.Replace('MYD021KM','MYD03')
     file_i_geo= input_directory+'\'+basefile_i_geo
     lat=get_hdf5_data(file_i_geo,'/Geolocation/Latitude')
     lon=get_hdf5_data(file_i_geo,'/Geolocation/Longitude')
