@@ -34,7 +34,7 @@ pro modis_calculate_toa330,input_directory=input_directory
     ;获取1-2波段的DN值
     EV_250_RefSB_data=get_hdf_dataset(file_list_hdf[file_i_hdf],'EV_250_Aggr1km_RefSB') ;1-2波段
     ;获取SI数据的列、行号（有时行号为2030，有时为2040）
-    DN_band_data_size=size(EV_250_RefSB_data)
+    DN_band_data_size=size(temporary(EV_250_RefSB_data))
 
     ;获取文件的时间、经纬度、四个角度
     ;其中经纬度、四个角度数据重采样 插值方法为双线性插值法（interp）
@@ -72,7 +72,6 @@ pro modis_calculate_toa330,input_directory=input_directory
 ;    ra_angle = abs(sa_angle - va_angle)
 ;    ra_angle = (ra_angle le 180.0) * ra_angle + (ra_angle gt 180.0) * (360.0 - ra_angle)  ;相对方位角
 
-    coor_angle_data=[[[sz_angle]],[[sa_angle]],[[vz_angle]],[[va_angle]],[[ra_angle]],[[lon]],[[lat]]]
 
     ;*******************************提取敦煌地区范围的数据********************************************
     pos=where((lon ge 94.17) and (lon le 94.37) and (lat ge 39.98)and(lat le 40.38),count)
@@ -103,11 +102,13 @@ pro modis_calculate_toa330,input_directory=input_directory
     dh_va_angle=va_angle[col_min:col_max,line_min:line_max]
     dh_ra_angle=ra_angle[col_min:col_max,line_min:line_max]
 
+    coor_angle_data=[[[sz_angle]],[[temporary(sa_angle)]],[[temporary(vz_angle)]],[[temporary(va_angle)]],[[temporary(ra_angle)]],[[temporary(lon)]],[[temporary(lat)]]]
+    
     ;这里计算的是1-19，26波段的toa反射率（总共22个波段，13、14），但没有进行太阳天顶角的校正
     MYD021KM_L1b_read,file_list_hdf[file_i_hdf],TOA_ref_nosz,/reflectance
     ;    MYD021KM_L1b_read,file_list_hdf[file_i_hdf],sz_angle=sz_angle,toadata,/reflectance
 
-    TOA_ref_nosz_angle=[[[TOA_ref_nosz]],[[coor_angle_data]]] ;为全幅影像，全波段的数据
+    TOA_ref_nosz_angle=[[[TOA_ref_nosz]],[[temporary(coor_angle_data)]]] ;为全幅影像，全波段的数据
     dh_TOA_ref_nosz_angle=TOA_ref_nosz_angle[col_min:col_max,line_min:line_max,*] ;为敦煌地区范围的全波段数据,包括未太阳天顶角校正的可见光波段数据+角度坐标信息
 
     ;去云去雪去水体处理，只处理敦煌地区范围的
@@ -131,18 +132,18 @@ pro modis_calculate_toa330,input_directory=input_directory
     
     dh_TOA_ref_mean=[]
     dh_TOA_ref_std=[]
-    ;处理前4个波段的数据
-    for layer_i=0,3 do begin
+    ;处理1-19,26波段的数据
+    for layer_i=0,21 do begin
       dh_TOA_ref=dh_TOA_ref_nosz_angle[*,*,layer_i]/cos(dh_sz_angle*!dtor) ;敦煌地区的toa反射率
       dh_TOA_ref[cloud_pos]=!VALUES.F_NAN
       dh_TOA_ref_mean=[dh_TOA_ref_mean,mean(dh_TOA_ref[dhpoint_pos_col-1:dhpoint_pos_col+1,dhpoint_pos_line-1:dhpoint_pos_line+1],/nan)]
       dh_TOA_ref_std=[dh_TOA_ref_std,stddev(dh_TOA_ref[dhpoint_pos_col-1:dhpoint_pos_col+1,dhpoint_pos_line-1:dhpoint_pos_line+1],/nan)]
-      dh_TOA_ref_nosz_angle[*,*,layer_i]=dh_TOA_ref ;此时为敦煌范围TOA反射率去云的真值
+      dh_TOA_ref_nosz_angle[*,*,layer_i]=temporary(dh_TOA_ref) ;此时为敦煌范围TOA反射率去云的真值
     endfor
 
     dh_Data0064=dh_TOA_ref_nosz_angle[*,*,0]
     dhpoint_Data0064=dh_Data0064[dhpoint_pos_col-1:dhpoint_pos_col+1,dhpoint_pos_line-1:dhpoint_pos_line+1]
-    dhpoint_NotNaN_pos=WHERE(FINITE(dhpoint_Data0064),count_notnan)
+    dhpoint_NotNaN_pos=WHERE(FINITE(temporary(dhpoint_Data0064)),count_notnan)
            
     if count_notnan ne 9  then begin
       print,file_basename(file_list_hdf[file_i_hdf])+'敦煌站点数据有效值不足'+string(file_n_hdf-file_i_hdf-1)
@@ -164,32 +165,22 @@ pro modis_calculate_toa330,input_directory=input_directory
       STRCOMPRESS(string(mean(dh_lon[dhpoint_pos_col-1:dhpoint_pos_col+1,dhpoint_pos_line-1:dhpoint_pos_line+1])))+$
       STRCOMPRESS(string(mean(dh_lat[dhpoint_pos_col-1:dhpoint_pos_col+1,dhpoint_pos_line-1:dhpoint_pos_line+1])))+$
       string(systime(1)-starttime1)+string(file_n_hdf-file_i_hdf-1)
-
-    EV_250_RefSB_data=!null
-    lat=!null
-    lon=!null
-    sz_angle=!null
-    sa_angle=!null
-    vz_angle=!null
-    va_angle=!null
-    ra_angle=!null
-    coor_angle_data=!null
-    dh_lon=!null
-    dh_lat=!null
-    dh_sz_angle=!null
-    dh_sa_angle=!null
-    dh_vz_angle=!null
-    dh_va_angle=!null
-    dh_ra_angle=!null
+      
+    poss=[temporary(pos),temporary(cloud_pos),temporary(dh_pos),temporary(dhpoint_pos),temporary(dhpoint_NotNaN_pos)]
+    dh_coor_angle_data=[[[temporary(dh_sz_angle)]],[[temporary(dh_sa_angle)]],[[temporary(dh_vz_angle)]],[[temporary(dh_va_angle)]],[[temporary(dh_ra_angle)]],[[temporary(dh_lat)]],[[temporary(dh_lon)]]]
+  
+    
     TOA_ref_nosz=!null
-    TOA_ref_nosz_angle=!null
-    cloud_data=!null
+    TOA_ref_nosz_angle=!null  
     dh_TOA_ref_nosz_angle=!null
-    dh_TOA_ref=!null
+    cloud_data=!null
+
     dh_Data0064=!null
     dh_angle_mean=!null
     dh_TOA_ref_mean=!null
     dh_TOA_ref_std=!null
+    poss=!null
+    dh_coor_angle_data=!null
   endfor
   ;free_lun,lun
   print,'所有文件提取完成'
