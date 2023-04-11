@@ -42,12 +42,12 @@ pro DBDT_DCC_FY3D,FY3DFile,TOAdata,CloudData,area=area,$
   angle=where(sz_angle ge 40 or vz_angle ge 40 and CloudData eq 0)
   CloudData[angle]=40B
   
-  
-  datetime=strmid(file_basename(FY3DFile,'.hdf'),19,8)+strmid(file_basename(FY3DFile,'.hdf'),28,4)
-  out_dir='H:\00data\FY3D\DCC\L1_data\tiff\cloud\'
-;  write_tiff,out_dir+datetime+'Data_std.tiff',ss,planarconfig=2,compression=1,/float
-;  write_tiff,out_dir+datetime+'CloudData_SCA.tiff',CloudData,planarconfig=2,compression=1,/float
-;  write_tiff,out_dir+datetime+'Data1080.tiff',Data1080,planarconfig=2,compression=1,/float
+  ;ss=[[[Data1080]],[[Data1080_std]]]  
+  ;datetime=strmid(file_basename(FY3DFile,'.hdf'),19,8)+strmid(file_basename(FY3DFile,'.hdf'),28,4)
+  ;out_dir='F:\FY_DCC\tiff\cloud\'
+  ;write_tiff,out_dir+datetime+'Data_std.tiff',ss,planarconfig=2,compression=1,/float
+  ;write_tiff,out_dir+datetime+'CloudData.tiff',CloudData,planarconfig=2,compression=1,/float
+  ;write_tiff,out_dir+datetime+'Data1080.tiff',Data1080,planarconfig=2,compression=1,/float
   
   
 end

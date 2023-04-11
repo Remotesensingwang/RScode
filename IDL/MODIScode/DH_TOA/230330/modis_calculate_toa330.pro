@@ -132,7 +132,7 @@ pro modis_calculate_toa330,input_directory=input_directory
     
     dh_TOA_ref_mean=[]
     dh_TOA_ref_std=[]
-    ;处理1-19,26波段的数据
+    ;处理1-19,26波段的数据(13lo 13hi 14lo 14hi)
     for layer_i=0,21 do begin
       dh_TOA_ref=dh_TOA_ref_nosz_angle[*,*,layer_i]/cos(dh_sz_angle*!dtor) ;敦煌地区的toa反射率
       dh_TOA_ref[cloud_pos]=!VALUES.F_NAN

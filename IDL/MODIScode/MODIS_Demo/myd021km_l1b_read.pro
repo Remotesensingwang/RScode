@@ -41,10 +41,9 @@ pro MYD021KM_L1b_read,MYD021KMFile,imagedata,$
     endfor
   endif
 
-  ;存储读取的1-4波段TOA数据,并进行太阳天顶角的校正
+  ;存储读取的1-19,26波段TOA数据,并进行太阳天顶角的校正
   if keyword_set(reflectance) and keyword_set(sz_angle) then begin
     imagedata=fltarr(DN_band_data_size[1],DN_band_data_size[2],DN_band_data_size[3])
-;    imagedata=fltarr(DN_band_data_size[1],DN_band_data_size[2],4)
     for layer_i=0,DN_band_data_size[3]-1 do begin
 ;    for layer_i=0,3 do begin   ;float(DN_band_data[*,*,layer_i] gt 0 and DN_band_data[*,*,layer_i] lt 32767)
       ;pos=where(DN_band_data[*,*,layer_i] le 0 or DN_band_data[*,*,layer_i] ge 32767)

@@ -3,27 +3,29 @@ import numpy as np
 import pandas as pd
 
 # *************************************
-# fy3d的DCC数据过滤
-# 只提取有效值大于300的值
-#
+# FY3D文件DCC范围的数据过滤
+# 只提取有效值（count）大于500的值
 # 进行2q过滤（Assessment of Radiometric Degradation of FY -3A MERSI Reflective Solar Bands Using TOA Reflectance of Pseudoinvariant Calibration Sites）
 # **************************************
 
-input_file=r'H:\00data\FY3D\DCC\TOA\0.8\DCC_2019_fy.xlsx'
-
+input_file=r'H:\00data\TOA\DCC\FY3D\407\base\DCC_fy-0.0.xlsx'
+out=r'H:\00data\TOA\DCC\FY3D\407\base\DCC_FY3D-0.0-base.xlsx'
+input_file1=r'H:\00data\TOA\DCC\FY3D\407\data\base\dcc_base_fy3d_day.xlsx'
+input_file2=r'H:\00data\TOA\DCC\FY3D\407\data\base\dcc_base_fy3d_month.xlsx'
 # *****************************Excel文件数据读取*****************************
-for fyband in ['FY_B1', 'FY_B2', 'FY_B3', 'FY_B4']:
-    fyband_STD=fyband+str('_STD')
-
-    df_base_1 = pd.read_excel(input_file, sheet_name="Sheet1",usecols=['FY_DateBase','FY_CNOTNAN','FY_SZ','FY_SA','FY_VZ','FY_VA','FY_RA',fyband,fyband_STD])  # From an Excel file
+for band in ['F_B1', 'F_B2', 'F_B3', 'F_B4','F_B5', 'F_B6', 'F_B7', 'F_B8', 'F_B16', 'F_B17', 'F_B18']:
+    # band_STD=band+str('_STD')
+    count=band+str('_C')
+    df_base_1 = pd.read_excel(input_file, sheet_name="base",usecols=['F_DateBase','F_SZ','F_SA','F_VZ','F_VA','F_RA','F_COUNT',count,band])  # From an Excel file
     df_base_1.dropna(inplace = True)
-    df_base=df_base_1[ df_base_1['FY_CNOTNAN']>300]
 
-    with pd.ExcelWriter(input_file, mode='a', engine='openpyxl') as writer:
-        df_base.to_excel(writer, sheet_name=fyband,index=False,header = True)
-    print(fyband)
+    df_base=df_base_1[ df_base_1[count]>500]
 
-    datebase=df_base['FY_DateBase'].values
+    # with pd.ExcelWriter(out, mode='a', engine='openpyxl') as writer:
+    #     df_base_1.to_excel(writer, sheet_name=band,index=False,header = True)
+    # print(band)
+
+    datebase=df_base['F_DateBase'].values
     year_out=[]
     month_out=[]
     day_out=[]
@@ -41,18 +43,18 @@ for fyband in ['FY_B1', 'FY_B2', 'FY_B3', 'FY_B4']:
     df_base['day']=day_out
 
     aver_day = df_base.groupby(['year', 'month','day']).mean()
-    df_day = aver_day.loc[:, ['FY_SZ','FY_SA','FY_VZ','FY_VA','FY_RA',fyband]]
+    df_day = aver_day.loc[:, ['F_SZ','F_SA','F_VZ','F_VA','F_RA',band]]
     df_day_index=list(df_day.index)
     # (2019,1,7)
     datetime=[]
     for y,m,d in df_day_index:
         date=str(y)+'{:0>2d}'.format(m)+'{:0>2d}'.format(d)
         datetime.append(int(date))
-    df_day['FY_DateBase']=datetime
+    df_day['F_DateBase']=datetime
 
     # 将列表按每20个数据进行分割
     fy_new=np.array([])
-    fy=df_day[fyband].values
+    fy=df_day[band].values
     split_data = np.array_split(fy,len(fy)/20+1)
     for data in split_data:
         filtered_data = np.zeros_like(data)
@@ -66,10 +68,12 @@ for fyband in ['FY_B1', 'FY_B2', 'FY_B3', 'FY_B4']:
             else:
                 filtered_data[i] = data[i]  # 如果该数据点没有受到污染，则不做处理
         fy_new = np.hstack((fy_new, filtered_data))
-    df_day[fyband]=fy_new
+    df_day[band]=fy_new
     df_day.dropna(inplace = True)
     aver_month = df_day.groupby(['year', 'month']).mean()
-    df_month = aver_month.loc[:, [fyband]]
-    with pd.ExcelWriter(input_file, mode='a', engine='openpyxl') as writer:
-        df_day.to_excel(writer, sheet_name="aver_day_"+str(fyband), index=False, header=True)
-    print(fyband+'成功')
+    df_month = aver_month.loc[:, [band]]
+    # with pd.ExcelWriter(input_file1, mode='a', engine='openpyxl') as writer:
+    #     df_day.to_excel(writer, sheet_name="aver_day_"+str(band), index=False, header=True)
+    # with pd.ExcelWriter(input_file2, mode='a', engine='openpyxl') as writer:
+    #     df_month.to_excel(writer, sheet_name="aver_month_" + str(band), index=True, header=True)
+    print(band+'成功')

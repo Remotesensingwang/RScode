@@ -17,7 +17,7 @@ pro DBDT_cloud_area,MOD02File,toadata_noza,CloudData,area=area,$
   
 ;  MODIS_LEVEL1B_READ,File,1,Data0064,/REFLECTANCE
 ;  MODIS_LEVEL1B_READ,File,2,Data0086,/REFLECTANCE
-;  MODIS_LEVEL1B_READ,File,3,Data0046,/REFLECTANCE
+;  MODIS_LEVEL1B_READ,File,3,Data0047,/REFLECTANCE
 ;  MODIS_LEVEL1B_READ,File,4,Data0051,/REFLECTANCE
 ;  MODIS_LEVEL1B_READ,File,7,Data0230,/REFLECTANCE
 ;  MODIS_LEVEL1B_READ,File,8,Data0412,/REFLECTANCE
@@ -29,11 +29,16 @@ pro DBDT_cloud_area,MOD02File,toadata_noza,CloudData,area=area,$
 
   Data0064=toadata_noza[*,*,0]
   Data0086=toadata_noza[*,*,1]
-  Data0046=toadata_noza[*,*,2]
+  Data0047=toadata_noza[*,*,2]
   Data0051=toadata_noza[*,*,3]
   Data0230=toadata_noza[*,*,6]
   Data0412=toadata_noza[*,*,7]
   Data0138=toadata_noza[*,*,21]
+  
+  
+  Data0047_std=get_std(Data0047,3,3)
+  Data0138_std=get_std_TB(Data0138,3,3)
+  
   
   DIM = SIZE(Data0064,/DIMENSIONS)
   NS = DIM[0]
@@ -54,10 +59,10 @@ pro DBDT_cloud_area,MOD02File,toadata_noza,CloudData,area=area,$
   CloudData[nan_Data0086]=1B
   CloudData[nan_Data0230]=2B
   CloudData[nan_Data0412]=3B
-  
+   
   FOR i = 1,NS-2,1 DO BEGIN
     FOR j = 1,NL-2,1 DO BEGIN
-      tmpData = Data0046[i-1:i+1,j-1:j+1]
+      tmpData = Data0047[i-1:i+1,j-1:j+1]
       tmpData2 = Data0138[i-1:i+1,j-1:j+1]
       tmpData3 = Data1120[i-1:i+1,j-1:j+1]
       w = WHERE(tmpData GT 0,countw)
@@ -105,7 +110,7 @@ pro DBDT_cloud_area,MOD02File,toadata_noza,CloudData,area=area,$
   ;write_tiff,out_target,CloudData,planarconfig=2,compression=1,/float
   
 
-    w2 = WHERE(Data0046 GT 0.4 OR Data0046 LE 0 AND CloudData EQ 0)
+    w2 = WHERE(Data0047 GT 0.4 OR Data0047 LE 0 AND CloudData EQ 0)
     CloudData[w2] = 20B
     w3 = WHERE(Data0138 GT 0.025 OR Data0138 LE 0 AND CloudData EQ 0)
     CloudData[w3] = 25B
@@ -129,30 +134,14 @@ pro DBDT_cloud_area,MOD02File,toadata_noza,CloudData,area=area,$
     ;write_tiff,result_tiff_name,CloudData,planarconfig=2,/float;,GEOTIFF=GEOTIFF
     
     ;场地均一性控制
-    
-    sz=toadata_noza[*,*,-7]
-    vz=toadata_noza[*,*,-5]
-    
-    
-    Data0064_std=get_std(Data0064/cos(sz*!dtor),3,3)
-    Data0086_std=get_std(Data0086/cos(sz*!dtor),3,3)
-    Data0046_std=get_std(Data0046/cos(sz*!dtor),3,3)
-    Data0051_std=get_std(Data0051/cos(sz*!dtor),3,3)
-    ;  Data0124_std=get_std(Data0124,3,3)
-    ;  Data0163_std=get_std(Data0163,3,3)
-    ;  Data0230_std=get_std(Data0230,3,3)
-    
-;    std_nan=WHERE(~FINITE(Data0064_std) or ~FINITE(Data0086_std) or ~FINITE(Data0046_std) or ~FINITE(Data0051_std))
-;    CloudData[std_nan]=100B
-    std_ge=WHERE(Data0064_std ge 0.05 or Data0086_std ge 0.05 or Data0046_std ge 0.05 or Data0051_std ge 0.05 AND CloudData EQ 0)
-    CloudData[std_ge]=150B
+
     ;angle=where(sz ge 40 or vz ge 40)
     angle=where(vz ge 40 AND CloudData EQ 0)
     CloudData[angle]=200B
-;    write_tiff,'H:\00data\MODIS\MODIS_L1data\tifout\dtcloud\data1120.tiff',Data1120,planarconfig=2,compression=1,/float
-;    out_target='H:\00data\MODIS\MODIS_L1data\tifout\dtcloud\CloudData.tiff'
-;    write_tiff,out_target,CloudData,planarconfig=2,compression=1,/float
-    
-    
+;    datetime=strmid(file_basename(File,'.hdf'),10,7)+strmid(file_basename(File,'.hdf'),18,4)
+;    out_dir='F:\modis_dh\tiff\cloud\dh\'
+;    write_tiff,out_dir+datetime+'Data_std_dh.tiff',ss,planarconfig=2,compression=1,/float
+;    write_tiff,out_dir+datetime+'Cloud_dh.tiff',CloudData,planarconfig=2,compression=1,/float
+        
   end
 

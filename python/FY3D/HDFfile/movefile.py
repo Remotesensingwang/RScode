@@ -29,8 +29,8 @@ def getDirFilePath(src_dir):
 
 if __name__ == '__main__':
 
-    src_dir =r'H:\00data\FY3D\DCC\download'+'\\'   # 原来的文件所在的根路径（该文件夹下有多个子文件夹，子文件夹下的是文件）
-    dst_dir = r'H:\00data\FY3D\DCC\L1_data\2020'+'\\'  # 移动之后的路径 记得加斜杠
+    src_dir =r'E:\fysea'+'\\'   # 原来的文件所在的根路径（该文件夹下有多个子文件夹，子文件夹下的是文件）
+    dst_dir = r'E:\fysea_1'+'\\'  # 移动之后的路径 记得加斜杠
     src_dirfilepath_list=getDirFilePath(src_dir)
     # print(src_dirfilepath_list)
     for srcdirfilepath in src_dirfilepath_list:

@@ -1,21 +1,20 @@
 ;coding=utf-8
 ;*****************************************************
-;对海洋定标场进行TOA计算（以海洋定标场中心点为中心，计算0.1°*0.1°范围的均值）
-;先提取海洋地区范围的TOA数据，并对海洋地区范围内的数据进行去云处理，最后提取海洋站点范围内的数据
-;范围选取：
+;先提取海洋地区范围的TOA数据，并对海洋地区范围内的数据进行去云处理
+;范围选取：10-20N 150-65E
 ;*****************************************************
 
 pro modis_calculate_toa_sea,input_directory=input_directory
   compile_opt idl2
-  input_directory='F:\MODIS_Sea\2019\test\HDF'
-  ;  input_directory='H:\00data\MODIS\MODIS_L1data\2020'
-  ;  input_directory='H:\00data\MODIS\MODIS_L1data\2021'
-  input_directory_GEO='F:\MODIS_Sea\2019\test\geo'
-  out_directory='F:\MODIS_Sea\2019\tt\tiff\cloudtiff\'
-  ;文件日期 角度 匹配站点范围各个波段的toa均值
-  ;openw,lun,'H:\00data\TOA\MODIS\removecloud\2019\1kmstd\330\TNP_modis_33.txt',/get_lun,/append,width=500
+  input_directory='E:\modissea\MYD021km\00'
+  input_directory_GEO='E:\modissea\MYD03'
+  DestPath='E:\modissea\NAN_MYD021km'
+  DestPath1='E:\modissea\NAN_MYD03'  
 
-  file_list_hdf=file_search(input_directory,'*.HDF',count=file_n_hdf)
+  ;文件日期 角度 匹配站点范围各个波段的toa均值
+  openw,lun,'E:\modissea\TNP_modis_2019.txt',/get_lun,/append,width=500
+
+  file_list_hdf=file_search(input_directory,'MYD021KM*.HDF',count=file_n_hdf)
   for file_i_hdf=0,file_n_hdf-1 do begin
     starttime1=systime(1)
 
@@ -100,11 +99,13 @@ pro modis_calculate_toa_sea,input_directory=input_directory
     TNP_pos=where(cloud_data eq 0,TNP_count)
     
     if TNP_count eq 0 then begin
-      print,file_basename(file_list_hdf[file_i_hdf])+'海洋范围数据为NAN'+string(file_n_hdf-file_i_hdf-1)
+      file_move,file_list_hdf[file_i_hdf],DestPath
+      file_move,file_i_geo,DestPath1      
+      print,file_basename(file_list_hdf[file_i_hdf])+'海洋范围数据为NAN,并移动成功'+string(file_n_hdf-file_i_hdf-1)
       continue
     endif
     
-    ;处理前19个波段的数据
+    ;处理1-19,26波段的数据(13lo 13hi 14lo 14hi)
     TNP_TOA_ref_mean=[]
     TNP_TOA_ref_count=[]
     for layer_i=0,21 do begin
@@ -119,10 +120,13 @@ pro modis_calculate_toa_sea,input_directory=input_directory
     endfor
     
     TNP_Data0064=TNP_TOA_ref_angle[*,*,0]
-    TNP_NotNaN_pos=WHERE(FINITE(TNP_Data0064),count_notnan1)
+    TNP_Data0064_size=size(TNP_Data0064)
+    TNP_NotNaN_pos=WHERE(FINITE(temporary(TNP_Data0064)),count_notnan1)
 
     if count_notnan1 eq 0  then begin
-      print,file_basename(file_list_hdf[file_i_hdf])+'海洋数据有效值不足'+string(file_n_hdf-file_i_hdf-1)
+      file_move,file_list_hdf[file_i_hdf],DestPath
+      file_move,file_i_geo,DestPath1
+      print,file_basename(file_list_hdf[file_i_hdf])+'海洋数据有效值不足，并移动成功'+string(file_n_hdf-file_i_hdf-1)
       continue
     endif
     
@@ -132,11 +136,9 @@ pro modis_calculate_toa_sea,input_directory=input_directory
       mean(TNP_vz_angle[TNP_NotNaN_pos]),mean(TNP_va_angle[TNP_NotNaN_pos]),$
       mean(TNP_ra_angle[TNP_NotNaN_pos]),mean(TNP_sca_angle[TNP_NotNaN_pos])]
     ;文件日期 角度 匹配站点范围各个波段的toa均值  ,逗号分隔
-    data=[string(datetime),string(temporary(TNP_angle_mean)),string(temporary(TNP_TOA_ref_mean)),string(temporary(TNP_TOA_ref_count))]
-    ;printf,lun,strcompress(data,/remove_all);,format='(25(a,:,","))'
-    print,file_basename(file_list_hdf[file_i_hdf])+$
-      STRCOMPRESS(string(mean(temporary(TNP_lon))))+STRCOMPRESS(string(mean(temporary(TNP_lat))))+$
-      string(systime(1)-starttime1)+string(file_n_hdf-file_i_hdf-1)
+    data=[string(datetime),string(TNP_angle_mean),string(TNP_TOA_ref_mean),string(TNP_Data0064_size[4]),string(TNP_TOA_ref_count)]
+    printf,lun,strcompress(data,/remove_all);,format='(25(a,:,","))'
+    print,file_basename(file_list_hdf[file_i_hdf])+STRCOMPRESS(string(mean(temporary(TNP_lon))))+STRCOMPRESS(string(mean(temporary(TNP_lat))))+string(systime(1)-starttime1)+string(file_n_hdf-file_i_hdf-1)
     TNP_coor_angle_data=[[[temporary(TNP_sz_angle)]],[[temporary(TNP_sa_angle)]],[[temporary(TNP_vz_angle)]],[[temporary(TNP_va_angle)]],[[temporary(TNP_ra_angle)]],[[temporary(TNP_sca_angle)]]]
     poss=[temporary(pos),temporary(cloud_pos),temporary(TNP_pos),temporary(fillvalue_pos_i),temporary(TNP_NotNaN_pos_i),temporary(TNP_NotNaN_pos)]
     
@@ -144,10 +146,12 @@ pro modis_calculate_toa_sea,input_directory=input_directory
     TOA_ref_angle=!null 
     TNP_TOA_ref_angle=!null   
     cloud_data=!null
-    TNP_Data0064=!null
+    TNP_angle_mean=!null
+    TNP_TOA_ref_mean=!null
+    TNP_TOA_ref_count=!null
     TNP_coor_angle_data=!null      
     poss=!null 
   endfor
-  ;free_lun,lun
+  free_lun,lun
   print,'所有文件提取完成'
 end

@@ -1,37 +1,26 @@
 # coding=utf-8
 import numpy as np
 import pandas as pd
-import datetime
-
 
 # **************************************
-# MODIS文件DCC范围的数据过滤
-# 首先按照band筛选有效值（count）的数据
+# MODIS文件Sea范围的数据过滤
+# 只提取有效值（count）大于3000的值
 # 进行2q过滤（Assessment of Radiometric Degradation of FY -3A MERSI Reflective Solar Bands Using TOA Reflectance of Pseudoinvariant Calibration Sites）
 # **************************************
 
-input_file=r'H:\00data\TOA\DCC\MODIS\407\base\DCC_modis-0.0.xlsx'
-out=r'H:\00data\TOA\DCC\MODIS\407\base\DCC_MODIS-0.0-base.xlsx'
+input_file=r'H:\00data\TOA\Sea\MODIS\base\TNP_modis_2019.xlsx'
+out=r'H:\00data\TOA\Sea\MODIS\base\TNP_modis_2019-base.xlsx'
 # *****************************Excel文件数据读取*****************************
-value_count1=[300,50,300,300,1000,300,1000,30,10,300,200,200]
-# value_count2=[]
-input_file1=r'H:\00data\TOA\DCC\MODIS\407\data\base\dcc_base_modis_day.xlsx'
-input_file2=r'H:\00data\TOA\DCC\MODIS\407\data\base\dcc_base_modis_month.xlsx'
-for band in ['M_B1', 'M_B2', 'M_B3', 'M_B4','M_B5', 'M_B6', 'M_B7', 'M_B8', 'M_B17', 'M_B18','M_B19', 'M_B26']:
+input_file1=r'H:\00data\TOA\Sea\MODIS\data\base\sea_base_modis_day.xlsx'
+input_file2=r'H:\00data\TOA\Sea\MODIS\data\base\sea_base_modis_month.xlsx'
+for band in [ 'M_B1', 'M_B2', 'M_B3', 'M_B4', 'M_B6', 'M_B7', 'M_B8', 'M_B9', 'M_B10', 'M_B12','M_B13L', 'M_B13H', 'M_B15', 'M_B16', 'M_B17', 'M_B18','M_B19', 'M_B26']:
     # band_STD=band+str('_STD')
     count=band+str('_C')
-    df_base_1 = pd.read_excel(input_file, sheet_name="base",usecols=['M_DateBase','M_SZ','M_SA','M_VZ','M_VA','M_RA','M_COUNT',count,band])  # From an Excel file
+    df_base_1 = pd.read_excel(input_file, sheet_name="base",usecols=['M_DateBase','M_SZ','M_SA','M_VZ','M_VA','M_RA','M_SCA','M_COUNT',count,band])  # From an Excel file
     df_base_1.dropna(inplace = True)
-    if band == 'M_B2' : value_count=50
-    elif band == 'M_B5' or band == 'M_B7' : value_count=1000
-    elif band == 'M_B8':value_count = 30
-    elif band == 'M_B17':value_count = 10
-    elif band == 'M_B18':value_count = 300
-    elif band == 'M_B19' or band == 'M_B26': value_count = 200
-    else: value_count=300
-    df_base = df_base_1[(df_base_1[count] > value_count)]
+    df_base = df_base_1[(df_base_1[count] > 3000)]
     # with pd.ExcelWriter(out, mode='a', engine='openpyxl') as writer:
-    #     df_base_1.to_excel(writer, sheet_name=band,index=False,header = True)
+    #     df_base.to_excel(writer, sheet_name=band,index=False,header = True)
     print(band)
     datebase=df_base['M_DateBase'].values
     year_out=[]
@@ -51,7 +40,7 @@ for band in ['M_B1', 'M_B2', 'M_B3', 'M_B4','M_B5', 'M_B6', 'M_B7', 'M_B8', 'M_B
     df_base['day']=day_out
 
     aver_day = df_base.groupby(['year', 'month','day']).mean()
-    df_day = aver_day.loc[:, ['M_SZ','M_SA','M_VZ','M_VA','M_RA',band]]
+    df_day = aver_day.loc[:, ['M_SZ','M_SA','M_VZ','M_VA','M_RA','M_SCA',band]]
     df_day_index=list(df_day.index)
     datetime=[]
     for y,m,d in df_day_index:

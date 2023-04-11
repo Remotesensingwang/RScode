@@ -1,16 +1,18 @@
 ;coding=utf-8
 ;*****************************************************
-;
-;
+;先提取海洋地区范围的TOA数据，并对海洋地区范围内的数据进行去云处理
+;范围选取：10-20N 150-65E
 ;*****************************************************
 
 pro fy3d_calculate_toa_sea,input_directory=input_directory
   compile_opt idl2
-  input_directory='F:\FY3D_Sea\2019\HDF'
-;  out_directory='F:\FY3D_Sea\2019\tiff\cloudtiff\SCA_0022_std0020\'
-  out_directory='F:\FY3D_Sea\2019\tiff\cloudtiff\SCA_0030_std0010_red0039\'
+  ;input_directory='F:\FY3D_Sea\2019\HDF'
+  input_directory='E:\fysea\201912'
+  ;out_directory='F:\FY3D_Sea\2019\tiff\cloudtiff\SCA_0022_std0020\'
+  ;out_directory='F:\FY3D_Sea\2019\tiff\cloudtiff\SCA_0030_std0010_red0039\'
+  DestPath='E:\fysea\NAN'
   ;文件日期 角度 匹配站点范围各个波段的toa均值
-  ;  openw,lun,'H:\00data\TOA\FY3D\removecloud\fycloudpro\1kmstd\326(20km)\basetxt\dh_dingbiao_fy3d20km.txt',/get_lun,/append,width=500
+  openw,lun,'E:\fysea\TNP_fy3d_2019.txt',/get_lun,/append,width=500
 
   file_list_hdf=file_search(input_directory,'*_1000M_MS.HDF',count=file_n_hdf)
 
@@ -88,7 +90,9 @@ pro fy3d_calculate_toa_sea,input_directory=input_directory
     TNP_pos=where(cloud_data eq 0,TNP_count)
 
     if TNP_count eq 0 then begin
-      print,file_basename(file_list_hdf[file_i_hdf])+'海洋范围数据为NAN'+string(file_n_hdf-file_i_hdf-1)
+      file_move,file_list_hdf[file_i_hdf],DestPath
+      file_move,file_i_geo,DestPath
+      print,file_basename(file_list_hdf[file_i_hdf])+'海洋范围数据为NAN,并移动成功'+string(file_n_hdf-file_i_hdf-1)
       continue
     endif
 
@@ -107,10 +111,13 @@ pro fy3d_calculate_toa_sea,input_directory=input_directory
     endfor
 
     TNP_Data0065=TNP_TOA_ref_angle[*,*,2]
+    TNP_Data0065_size=size(TNP_Data0065)
     TNP_NotNaN_pos=WHERE(FINITE(temporary(TNP_Data0065)),count_notnan1)
 
     if count_notnan1 eq 100  then begin
-      print,file_basename(file_list_hdf[file_i_hdf])+'海洋数据有效值不足'+string(file_n_hdf-file_i_hdf-1)
+      file_move,file_list_hdf[file_i_hdf],DestPath
+      file_move,file_i_geo,DestPath
+      print,file_basename(file_list_hdf[file_i_hdf])+'海洋数据有效值不足,并移动成功'+string(file_n_hdf-file_i_hdf-1)
       continue
     endif
 
@@ -120,8 +127,8 @@ pro fy3d_calculate_toa_sea,input_directory=input_directory
       mean(TNP_vz_angle[TNP_NotNaN_pos]),mean(TNP_va_angle[TNP_NotNaN_pos]),$
       mean(TNP_ra_angle[TNP_NotNaN_pos]),mean(TNP_sca_angle[TNP_NotNaN_pos])]
     ;文件日期 角度 匹配站点范围各个波段的toa均值  ,逗号分隔
-    data=[string(datetime),string(TNP_angle_mean),string(TNP_TOA_ref_mean),string(TNP_TOA_ref_count)]
-    ;printf,lun,strcompress(data,/remove_all);,format='(25(a,:,","))'
+    data=[string(datetime),string(TNP_angle_mean),string(TNP_TOA_ref_mean),string(TNP_Data0065_size[4]),string(TNP_TOA_ref_count)]
+    printf,lun,strcompress(data,/remove_all);,format='(25(a,:,","))'
     print,file_basename(file_list_hdf[file_i_hdf])+$
       STRCOMPRESS(string(mean(temporary(TNP_lon))))+STRCOMPRESS(string(mean(temporary(TNP_lat))))+$
       string(systime(1)-starttime1)+string(file_n_hdf-file_i_hdf-1)
@@ -139,6 +146,6 @@ pro fy3d_calculate_toa_sea,input_directory=input_directory
     poss=!null
     
   endfor
-  ;  free_lun,lun
+  free_lun,lun
   print,'所有文件提取完成'
 end

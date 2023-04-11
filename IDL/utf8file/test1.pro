@@ -1,5 +1,5 @@
 ;coding=GB2312
-pro test
+pro test1
   ;encoding=‘GB2312’
 ;  WRITE_CSV,'D:\IDLcode\1.csv',[2000,2020],[1,2],HEADER=['年份','均值'] 
 ;  print,'年份的'
@@ -10,4 +10,5 @@ pro test
   kernelWide = [kernel1, kernel2] ; concatenate along first dimension
   kernelTall = [[kernel1], [kernel2]] ; concatenate along second dimensio
   print,kernelWide
+  print,kernelTall
 end

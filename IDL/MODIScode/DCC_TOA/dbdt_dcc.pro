@@ -48,10 +48,12 @@ pro DBDT_DCC,MOD02File,TOA_angle_data,CloudData,area=area,$
   CloudData[Data1120_ge]=30B
   angle=where(sz ge 40 or vz ge 40 and CloudData eq 0)
   CloudData[angle]=40B
-
-  result_tiff_name='C:\Users\lenovo\Downloads\DCC\01\tiff\Data1120_0730.tiff'
-;  write_tiff,result_tiff_name,Data1120,planarconfig=2,/float;,GEOTIFF=GEOTIFF
-;   print,string(systime(1)-start_time)
+  
+  ;ss=[[[Data1120]],[[Data1120_std]]]
+  ;datetime=strmid(file_basename(File,'.hdf'),10,7)+strmid(file_basename(File,'.hdf'),18,4)
+  ;out_dir='F:\MODIS_DCC\tiff\cloud\'
+  ;write_tiff,out_dir+datetime+'Data1120.tiff',ss,planarconfig=2,compression=1,/float
+  ;write_tiff,out_dir+datetime+'Cloud_dcc.tiff',CloudData,planarconfig=2,compression=1,/float
 
 end
 

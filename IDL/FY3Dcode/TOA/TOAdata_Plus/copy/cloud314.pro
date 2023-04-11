@@ -98,24 +98,6 @@ pro cloud314,FY3DFile,TOAdata,CloudData,area=area,$
   ;sz=TOAdata[*,*,-7]
   vz=TOAdata[*,*,-5]
 
-
-  Data0047=TOAdata[*,*,0]  ;0.47um
-  Data0055=TOAdata[*,*,1] ;0.55um
-  Data0065=TOAdata[*,*,2]   ;0.65um
-  Data0087=TOAdata[*,*,3] ;0.87um
-
-  Data0047_std=get_std(Data0047,3,3)
-  Data0055_std=get_std(Data0055,3,3)
-  Data0065_std=get_std(Data0065,3,3)
-  Data0087_std=get_std(Data0087,3,3)
-  ;  Data0124_std=get_std(Data0124,3,3)
-  ;  Data0163_std=get_std(Data0163,3,3)
-  ;  Data0230_std=get_std(Data0230,3,3)
-
-  ;    std_nan=WHERE(~FINITE(Data0064_std) or ~FINITE(Data0086_std) or ~FINITE(Data0046_std) or ~FINITE(Data0051_std))
-  ;    CloudData[std_nan]=100B
-  std_ge=WHERE(Data0047_std ge 0.05 or Data0055_std ge 0.05 or Data0065_std ge 0.05 or Data0087_std ge 0.05)
-  CloudData[std_ge]=150B
   ;angle=where(sz ge 40 or vz ge 40)
   angle=where(vz ge 40)
   CloudData[angle]=200B

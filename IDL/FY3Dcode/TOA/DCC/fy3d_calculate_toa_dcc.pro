@@ -5,13 +5,13 @@
 ;注意 这里限制了TOA的数据，其中对于于 0.8 以下的云反射率的观测值被丢弃
 ;*****************************************************
 
-pro fy3d_calculate_toa_DCC
+pro fy3d_calculate_toa_DCC,input_directory=input_directory
   compile_opt idl2
-  input_directory='H:\00data\FY3D\DCC\L1_data\2020'
-  DestPath='H:\00data\FY3D\DCC\L1_data_NAN\2020'
-  out_directory='H:\00data\FY3D\DCC\L1_data\tiff\basetiff\'
+  ;input_directory='F:\FY_DCC\hdf'
+  DestPath='H:\00data\FY3D\DCC\L1_data_NAN\2019'
+  ;out_directory='F:\FY_DCC\tiff\cloutiff\'
   ;文件日期 角度 匹配站点范围各个波段的toa均值
-  ;openw,lun,'H:\00data\FY3D\DCC\TOA\0.8\DCC_2020_modis-0.8.txt',/get_lun,/append,width=500
+  openw,lun,'H:\00data\FY3D\DCC\TOA\0.0\DCC_fy-0.0.txt',/get_lun,/append,width=500
   file_list_hdf=file_search(input_directory,'*_1000M_MS.HDF',count=file_n_hdf)
 
   ;*****************************************************文件批处理 *****************************************************
@@ -28,7 +28,7 @@ pro fy3d_calculate_toa_DCC
 
     ;获取文件的时间
     datetime=strmid(file_basename(file_list_hdf[file_i_hdf],'.hdf'),19,8)+strmid(file_basename(file_list_hdf[file_i_hdf],'.hdf'),28,4)
-    ;    hour=fix(strmid(datetime,8,2))
+    ;hour=fix(strmid(datetime,8,2))
     ;获取GEO文件的经纬度及四个角度数据
     basefile_i_geo=file_basename(file_list_hdf[file_i_hdf])
     strput, basefile_i_geo, "GEO1K_MS.HDF",33 ;字符串替换
@@ -67,7 +67,6 @@ pro fy3d_calculate_toa_DCC
     coor_angle_data=[[[sz_angle]],[[temporary(sa_angle)]],[[temporary(vz_angle)]],[[temporary(va_angle)]],[[temporary(ra_angle)]],[[temporary(lon)]],[[temporary(lat)]]]
     
     if  count eq 0 or (col_max-col_min) lt 3 or (line_max-line_min) lt 3 then begin
-      ;print,file_basename(file_list_hdf[file_i_hdf])+'pos失败'+string(systime(1)-starttime1)+string(file_n_hdf-file_i_hdf-1)
       file_delete,[file_list_hdf[file_i_hdf],file_i_geo]
       print,file_basename(file_list_hdf[file_i_hdf])+'DCC范围提取失败,并删除成功'+string(file_n_hdf-file_i_hdf-1)
       continue
@@ -79,8 +78,7 @@ pro fy3d_calculate_toa_DCC
 
     TOA_ref_angle=[[[TOA_ref]],[[temporary(coor_angle_data)]]] ;TOA_ref_angle为全幅影像，全波段的数据
     DCC_TOA_ref_angle=TOA_ref_angle[col_min:col_max,line_min:line_max,*] ;DCC_TOA_ref_angle为DCC范围的全波段数据
-;    DCC_TOA_ref_angle=TOA_ref_angle
-;    write_tiff,out_directory+datetime+'TOA_Base.tiff',DCC_TOA_ref_angle,planarconfig=2,compression=1,/float;,GEOTIFF=GEOTIFF
+    ;write_tiff,'F:\FY_DCC\tiff\basetiff\'+datetime+'TOA_Base.tiff',DCC_TOA_ref_angle,planarconfig=2,compression=1,/float;,GEOTIFF=GEOTIFF
 
     ;*****************************************************去云处理 只处理DCC范围的*************************************************************
     DBDT_DCC_FY3D,file_list_hdf[file_i_hdf],DCC_TOA_ref_angle,cloud_data,col_min=col_min,col_max=col_max,line_min=line_min,line_max=line_max,/area
@@ -97,28 +95,36 @@ pro fy3d_calculate_toa_DCC
 
     ;处理1-19波段的数据
     DCC_TOA_ref_mean=[]
-;    DCC_TOA_ref_std=[]
+    ;DCC_TOA_ref_std=[]
     DCC_TOA_ref_count=[]
+    DCC_TOA_ref_angle_size=size(DCC_TOA_ref_angle)
+    std=fltarr(DCC_TOA_ref_angle_size[1],DCC_TOA_ref_angle_size[2],22)    
+    
     for layer_i=0,18 do begin
-      DCC_TOA_ref=DCC_TOA_ref_angle[*,*,layer_i]           
-      fillvalue_pos=where(DCC_TOA_ref le 0.8 or DCC_TOA_ref ge 1 or $ 
-        ~FINITE(get_std(DCC_TOA_ref,3,3)) or get_std(DCC_TOA_ref,3,3) ge 0.03,count)
+      DCC_TOA_ref=DCC_TOA_ref_angle[*,*,layer_i]
+      
+      ;ss1=get_std(DCC_TOA_ref,3,3)
+      ;std[*,*,layer_i]=ss1 
+                     
+      fillvalue_pos=where(DCC_TOA_ref le 0 or DCC_TOA_ref ge 1 or $ 
+        ~FINITE(get_std(DCC_TOA_ref,3,3)) or get_std(DCC_TOA_ref,3,3) ge 0.02,count)
       if count gt 0 then   DCC_TOA_ref[fillvalue_pos]=!values.F_NAN
-      DCC_TOA_ref[cloud_pos]=!VALUES.F_NAN
+      DCC_TOA_ref[cloud_pos]=!VALUES.F_NAN      
       DCC_TOA_ref_mean=[DCC_TOA_ref_mean,mean(DCC_TOA_ref,/nan)]
-;      DCC_TOA_ref_std=[DCC_TOA_ref_std,stddev(DCC_TOA_ref,/nan)]
+      ;DCC_TOA_ref_std=[DCC_TOA_ref_std,stddev(DCC_TOA_ref,/nan)]
       DCC_NotNaN_pos_i=WHERE(FINITE(DCC_TOA_ref),count_notnan)
       DCC_TOA_ref_count=[DCC_TOA_ref_count,count_notnan]
       DCC_TOA_ref_angle[*,*,layer_i]=temporary(DCC_TOA_ref)
     endfor
-
-;    write_tiff,'H:\00data\FY3D\DCC\L1_data\tiff\cloudtiff\'+datetime+'TOA_cloud.tiff',DCC_TOA_ref_angle,planarconfig=2,compression=1,/float;,GEOTIFF=GEOTIFF
+    ;write_tiff,out_directory+datetime+'std.tiff',std,planarconfig=2,compression=1,/float;,GEOTIFF=GEOTIFF
+    ;write_tiff,out_directory+datetime+'TOA_cloud-0.0.tiff',DCC_TOA_ref_angle,planarconfig=2,compression=1,/float;,GEOTIFF=GEOTIFF
 
 
     DCC_Data0065=DCC_TOA_ref_angle[*,*,2]
+    DCC_Data0065_size=size(DCC_Data0065)
     NotNaN_pos=WHERE(FINITE(temporary(DCC_Data0065)),count_notnan1)
 
-    if count_notnan1 le 50  then begin
+    if count_notnan1 le 100  then begin
       file_move,file_list_hdf[file_i_hdf],DestPath
       file_move,file_i_geo,DestPath
       print,file_basename(file_list_hdf[file_i_hdf])+'DCC范围数据为NAN1，并移动成功'+string(file_n_hdf-file_i_hdf-1)
@@ -130,8 +136,8 @@ pro fy3d_calculate_toa_DCC
     DCC_angle_mean=[mean(DCC_sz_angle[NotNaN_pos]),mean(DCC_sa_angle[NotNaN_pos]),mean(DCC_vz_angle[NotNaN_pos]),mean(DCC_va_angle[NotNaN_pos]),mean(DCC_ra_angle[NotNaN_pos])]
 
     ;文件日期 角度 匹配站点范围各个波段的toa均值  ,逗号分隔
-    data=[string(datetime),string(DCC_angle_mean),string(DCC_TOA_ref_mean),string(DCC_TOA_ref_count)]
-    ;printf,lun,strcompress(data,/remove_all);,format='(25(a,:,","))'
+    data=[string(datetime),string(DCC_angle_mean),string(DCC_TOA_ref_mean),string(DCC_Data0065_size[4]),string(DCC_TOA_ref_count)]
+    printf,lun,strcompress(data,/remove_all);,format='(25(a,:,","))'
     print,file_basename(file_list_hdf[file_i_hdf])+STRCOMPRESS(string(mean(temporary(DCC_lon))))+STRCOMPRESS(string(mean(temporary(DCC_lat))))+string(systime(1)-starttime1)+string(file_n_hdf-file_i_hdf-1)
     
     
@@ -150,6 +156,6 @@ pro fy3d_calculate_toa_DCC
     DCC_coor_angle_data=!null
 ;    DCC_TOA_ref_std=!null
   endfor
-  ;free_lun,lun
+  free_lun,lun
   print,'所有文件提取完成'
 end
